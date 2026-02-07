@@ -35,6 +35,21 @@ function App() {
     { id: 3, user: 'Alex R.', comment: "It's okay, but needs dark mode.", sentiment: 'neutral', date: '1d ago' },
   ]);
 
+  // Recent Activity Log
+  const [recentActivities, setRecentActivities] = React.useState([
+    { id: 1, text: "Project initialized", type: "system", timestamp: new Date(Date.now() - 86400000).toLocaleString() }
+  ]);
+
+  const logActivity = (text, type = 'system') => {
+    const newActivity = {
+      id: Date.now(),
+      text,
+      type,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    setRecentActivities(prev => [newActivity, ...prev].slice(0, 5)); // Keep last 5
+  };
+
   const toggleRole = () => {
     setUserRole(prev => prev === 'founder' ? 'member' : 'founder');
   };
@@ -48,7 +63,7 @@ function App() {
       assignee: 'AF'
     };
     setTasks(prev => [...prev, newTask]);
-    alert("Feedback converted to Task and added to Roadmap!");
+    logActivity(`Converted "${feedbackItem.label}" feedback to task`, 'task');
     alert("Feedback converted to Task and added to Roadmap!");
   };
 
@@ -143,7 +158,10 @@ function App() {
       teamMembers,
       addTeamMember,
       updateTeamMember,
-      removeTeamMember
+      removeTeamMember,
+      // Activity
+      recentActivities,
+      logActivity
     }}>
       <Routes>
         <Route path="/validate/:id" element={<PublicValidation />} />

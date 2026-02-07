@@ -9,7 +9,7 @@ import { Plus, X } from 'lucide-react';
 import { UserContext } from '../App';
 
 const Roadmap = () => {
-    const { tasks, setTasks } = React.useContext(UserContext);
+    const { tasks, setTasks, logActivity, userRole } = React.useContext(UserContext);
     const [activeId, setActiveId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newTask, setNewTask] = useState({ content: '', milestone: 'MVP', assignee: 'AF' });
@@ -31,6 +31,7 @@ const Roadmap = () => {
             assignee: newTask.assignee
         };
         setTasks([...tasks, task]);
+        logActivity(`Created task "${task.content}"`, 'task');
         setIsModalOpen(false);
         setNewTask({ content: '', milestone: 'MVP', assignee: 'AF' });
     };
@@ -47,6 +48,22 @@ const Roadmap = () => {
         if (active.id !== over.id) {
             const activeTask = tasks.find(t => t.id === active.id);
             const overTask = tasks.find(t => t.id === over.id);
+
+            // Log status change if moving between columns
+            let newStatus = null;
+            if (overTask && activeTask.status !== overTask.status) {
+                newStatus = overTask.status;
+            } else if (!overTask && initialColumns.map(c => c.id).includes(over.id) && activeTask.status !== over.id) {
+                newStatus = over.id;
+            }
+
+            if (newStatus) {
+                if (newStatus === 'done') {
+                    logActivity(`Completed task "${activeTask.content}"`, 'milestone');
+                } else {
+                    logActivity(`Moved "${activeTask.content}" to ${newStatus.replace('-', ' ')}`, 'status');
+                }
+            }
 
             if (overTask) {
                 setTasks((items) => {

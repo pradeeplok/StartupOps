@@ -1,11 +1,13 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import CircularProgress from '../components/CircularProgress';
-import { TrendingUp, Users, IndianRupee, Activity, Sparkles, Lightbulb, AlertTriangle } from 'lucide-react';
+import { TrendingUp, Users, IndianRupee, Activity, Sparkles, Lightbulb, AlertTriangle, CircleDashed, ListTodo, Loader2, CheckCircle2 } from 'lucide-react';
 
 import { UserContext } from '../App';
 
 const Dashboard = () => {
-    const { userRole, tasks, feedbackData } = React.useContext(UserContext);
+    const { userRole, tasks, feedbackData, financialData, runwayMonths, recentActivities } = React.useContext(UserContext);
+    const navigate = useNavigate();
 
     // Calculate Health Score Metrics
     const validationScore = Math.round(
@@ -58,7 +60,7 @@ const Dashboard = () => {
                 bg: '#eff6ff',   // blue-50
                 borderColor: '#3b82f6', // blue-500
                 title: 'Optimize Runway',
-                description: 'At current burn rate, runway is 8 months. Focus on closing deals this quarter.'
+                description: `At current burn rate, runway is ${runwayMonths} months. Focus on closing deals this quarter.`
             });
         }
 
@@ -150,7 +152,10 @@ const Dashboard = () => {
                                 <p style={{ fontSize: '0.875rem', color: 'var(--slate-600)', lineHeight: 1.5, marginBottom: '0.75rem' }}>
                                     {insight.description}
                                 </p>
-                                <button className="text-xs font-bold uppercase tracking-wide text-blue-600 hover:underline">
+                                <button
+                                    onClick={() => navigate('/finance')}
+                                    className="text-xs font-bold uppercase tracking-wide text-blue-600 hover:underline"
+                                >
                                     Take Action →
                                 </button>
                             </div>
@@ -168,17 +173,6 @@ const Dashboard = () => {
             `}</style>
 
             <div className="stats-grid">
-                {/* Quick Stats Cards */}
-                <div className="stat-card">
-                    <div className="stat-icon blue">
-                        <Users size={24} />
-                    </div>
-                    <div>
-                        <div className="stat-value">1,240</div>
-                        <div className="stat-label">Active Users</div>
-                    </div>
-                </div>
-
                 {userRole === 'founder' && (
                     <>
                         <div className="stat-card">
@@ -186,7 +180,7 @@ const Dashboard = () => {
                                 <IndianRupee size={24} />
                             </div>
                             <div>
-                                <div className="stat-value">₹4.2k</div>
+                                <div className="stat-value">₹{financialData.mrr.toLocaleString()}</div>
                                 <div className="stat-label">MRR</div>
                             </div>
                         </div>
@@ -206,7 +200,7 @@ const Dashboard = () => {
                                 <Activity size={24} />
                             </div>
                             <div>
-                                <div className="stat-value">8 Mo</div>
+                                <div className="stat-value">{runwayMonths} Mo</div>
                                 <div className="stat-label">Runway</div>
                             </div>
                         </div>
@@ -268,55 +262,108 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Task Completion Trends */}
-                <div className="section-card" style={{ gridColumn: 'span 2' }}>
-                    <h3 className="column-title" style={{ marginBottom: '1.5rem' }}>Task Completion Trends</h3>
-                    <div style={{ display: 'flex', alignItems: 'flex-end', height: '150px', gap: '2rem', padding: '0 1rem' }}>
-                        {[45, 60, 75, 50, 80, 95, 85].map((h, i) => (
-                            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                                <div className="bar-tooltip" style={{ opacity: 0, transition: 'opacity 0.2s', fontSize: '0.75rem', color: 'var(--slate-600)' }}>{h}%</div>
-                                <div style={{
-                                    width: '100%',
-                                    height: `${h}%`,
-                                    backgroundColor: 'var(--primary-blue)',
-                                    borderRadius: '4px 4px 0 0',
-                                    opacity: 0.8,
-                                    transition: 'height 0.5s'
-                                }}></div>
-                                <span style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>W{i + 1}</span>
-                            </div>
-                        ))}
+                {/* Task Status Distribution (Pipeline Cards) */}
+                <div className="section-card" style={{ gridColumn: 'span 2', background: 'transparent', boxShadow: 'none', padding: 0, border: 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                        <h3 className="column-title" style={{ marginBottom: 0 }}>Live Execution Pipeline</h3>
+                        <span className="text-xs font-medium text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm">
+                            Real-time snapshot
+                        </span>
                     </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
+                        {[
+                            { id: 'backlog', label: 'Backlog', icon: <CircleDashed size={20} />, color: 'var(--slate-500)', bg: 'var(--slate-50)' },
+                            { id: 'todo', label: 'To Do', icon: <ListTodo size={20} />, color: 'var(--accent-orange)', bg: '#fff7ed' },
+                            { id: 'in-progress', label: 'In Progress', icon: <Loader2 size={20} className="animate-spin-slow" />, color: 'var(--primary-blue)', bg: '#eff6ff' },
+                            { id: 'done', label: 'Done', icon: <CheckCircle2 size={20} />, color: 'var(--accent-teal)', bg: '#f0fdf4' }
+                        ].map((status) => {
+                            const count = tasks.filter(t => t.status === status.id).length;
+                            const percentage = Math.round((count / (tasks.length || 1)) * 100) || 0;
+
+                            return (
+                                <div key={status.id} style={{
+                                    background: 'white',
+                                    borderRadius: '0.75rem',
+                                    padding: '1.25rem',
+                                    border: '1px solid var(--border-light)',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '1rem',
+                                    transition: 'transform 0.2s, box-shadow 0.2s',
+                                    cursor: 'default'
+                                }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'; }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: status.color }}>
+                                        <div style={{ padding: '0.5rem', borderRadius: '0.5rem', backgroundColor: status.bg }}>
+                                            {status.icon}
+                                        </div>
+                                        <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{status.label}</span>
+                                    </div>
+
+                                    <div>
+                                        <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--slate-800)', lineHeight: 1 }}>{count}</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--slate-400)', marginTop: '0.25rem' }}>Tasks</div>
+                                    </div>
+
+                                    <div style={{
+                                        width: '100%',
+                                        height: '6px',
+                                        backgroundColor: 'var(--slate-100)',
+                                        borderRadius: '3px',
+                                        overflow: 'hidden',
+                                        marginTop: 'auto'
+                                    }}>
+                                        <div style={{
+                                            width: `${percentage}%`,
+                                            height: '100%',
+                                            backgroundColor: status.color,
+                                            borderRadius: '3px',
+                                            transition: 'width 0.5s ease-in-out'
+                                        }}></div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <style>{`
+                        .animate-spin-slow { animation: spin 3s linear infinite; }
+                    `}</style>
                 </div>
 
-                {/* Recent Milestones & Activity */}
+                {/* Recent Milestones & Activity (Real-Time) */}
                 <div className="section-card" style={{ gridColumn: 'span 2' }}>
                     <h3 className="column-title" style={{ marginBottom: '1rem' }}>Recent Activity & Milestones</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {[
-                            { title: 'MVP Milestone Reached', type: 'milestone', date: '2 days ago', color: '#16a34a', bg: '#f0fdf4' },
-                            { title: 'New Feedback Logged: "Love the dashboard"', type: 'feedback', date: '4 hours ago', color: '#2563eb', bg: '#eff6ff' },
-                            { title: 'Database Schema Finalized', type: 'task', date: '1 day ago', color: '#475569', bg: '#f1f5f9' }
-                        ].map((item, i) => (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)' }}>
-                                <div style={{ width: '0.5rem', height: '0.5rem', borderRadius: '50%', backgroundColor: 'var(--slate-400)' }}></div>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontWeight: 500, color: 'var(--slate-800)' }}>{item.title}</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>{item.date}</div>
+                        {recentActivities && recentActivities.length > 0 ? (
+                            recentActivities.map((activity) => (
+                                <div key={activity.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)' }}>
+                                    <div style={{ width: '0.5rem', height: '0.5rem', borderRadius: '50%', backgroundColor: activity.type === 'milestone' ? 'var(--accent-teal)' : 'var(--primary-blue)' }}></div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: 500, color: 'var(--slate-800)' }}>{activity.text}</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>{activity.timestamp}</div>
+                                    </div>
+                                    <div style={{
+                                        padding: '0.25rem 0.5rem',
+                                        borderRadius: '0.25rem',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 500,
+                                        textTransform: 'uppercase',
+                                        color: activity.type === 'milestone' ? '#16a34a' : activity.type === 'status' ? '#ea580c' : '#2563eb',
+                                        backgroundColor: activity.type === 'milestone' ? '#f0fdf4' : activity.type === 'status' ? '#fff7ed' : '#eff6ff'
+                                    }}>
+                                        {activity.type}
+                                    </div>
                                 </div>
-                                <div style={{
-                                    padding: '0.25rem 0.5rem',
-                                    borderRadius: '0.25rem',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 500,
-                                    textTransform: 'uppercase',
-                                    color: item.color,
-                                    backgroundColor: item.bg
-                                }}>
-                                    {item.type}
-                                </div>
+                            ))
+                        ) : (
+                            <div style={{ textAlign: 'center', color: 'var(--slate-400)', padding: '1rem' }}>
+                                No recent activity
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
             </div>
