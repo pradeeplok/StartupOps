@@ -8,18 +8,46 @@ import Finance from './pages/Finance';
 import Team from './pages/Team';
 import Settings from './pages/Settings';
 import PitchDeck from './pages/PitchDeck';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import ProtectedRoute from './components/ProtectedRoute';
 
 import { initialTasks, columns as initialColumns, users } from './data/mockData';
 
 import PublicValidation from './pages/PublicValidation';
 import PublicRoadmap from './pages/PublicRoadmap';
 import InvestorReport from './pages/InvestorReport';
+import { auth } from './config/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 // Simple User Context for Role-Based Access & Global State
 export const UserContext = React.createContext();
 
 function App() {
-  const [userRole, setUserRole] = React.useState('founder'); // 'founder' | 'member'
+  // --- Authentication State ---
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [currentUser, setCurrentUser] = React.useState(null);
+  const [authLoading, setAuthLoading] = React.useState(true);
+  const [userRole, setUserRole] = React.useState('founder');
+
+  // Listen to Firebase auth state changes
+  React.useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAuthenticated(true);
+        setCurrentUser(user);
+        // You can fetch user role from Firestore here if needed
+        setUserRole('founder'); // Default for now
+      } else {
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+        setUserRole('founder');
+      }
+      setAuthLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Lifted State for Innovation "Loop"
   const [tasks, setTasks] = React.useState(initialTasks);
@@ -62,6 +90,15 @@ function App() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     setRecentActivities(prev => [newActivity, ...prev].slice(0, 5)); // Keep last 5
+  };
+
+  // --- Authentication Functions ---
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const toggleRole = () => {
@@ -166,6 +203,10 @@ function App() {
 
   return (
     <UserContext.Provider value={{
+      isAuthenticated,
+      currentUser,
+      authLoading,
+      logout,
       userRole,
       toggleRole,
       theme,
@@ -194,10 +235,19 @@ function App() {
       logActivity
     }}>
       <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/validate/:id" element={<PublicValidation />} />
         <Route path="/roadmap/public/:id" element={<PublicRoadmap />} />
         <Route path="/report/investor" element={<InvestorReport />} />
-        <Route path="/" element={<Layout />}>
+
+        {/* Protected Routes */}
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }>
           <Route index element={<Dashboard />} />
           <Route path="roadmap" element={<Roadmap />} />
           <Route path="recommendation" element={<Validation />} />

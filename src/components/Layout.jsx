@@ -5,7 +5,7 @@ import { LayoutDashboard, Map, BarChart3, Users, Settings, LogOut, Presentation,
 import { UserContext } from '../App';
 
 const Layout = () => {
-    const { userRole, toggleRole, theme, toggleTheme } = React.useContext(UserContext);
+    const { userRole, toggleRole, theme, toggleTheme, logout } = React.useContext(UserContext);
 
     const allNavItems = [
         { label: 'Command Center', path: '/', icon: LayoutDashboard },
@@ -53,7 +53,10 @@ const Layout = () => {
                         <Settings size={18} />
                         Settings
                     </NavLink>
-                    <button className="footer-btn logout">
+                    <button className="footer-btn logout" onClick={() => {
+                        logout();
+                        window.location.href = '/login';
+                    }}>
                         <LogOut size={18} />
                         Logout
                     </button>
