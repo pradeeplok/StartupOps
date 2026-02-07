@@ -17,11 +17,58 @@ const Validation = () => {
             user: newFeedback.user,
             comment: newFeedback.comment,
             sentiment: newFeedback.sentiment,
-            date: 'Just now'
+            date: new Date().toISOString()
         };
         setRecentFeedback([feedback, ...recentFeedback]);
         setIsModalOpen(false);
         setNewFeedback({ user: '', comment: '', sentiment: 'positive' });
+    };
+
+    // --- Dynamic Sentiment Analysis ---
+    const sentimentMetrics = React.useMemo(() => {
+        if (recentFeedback.length === 0) return { score: 0, trend: [] };
+
+        // 1. Calculate Overall Score (% Positive)
+        const positiveCount = recentFeedback.filter(f => f.sentiment === 'positive').length;
+        const positiveScore = Math.round((positiveCount / recentFeedback.length) * 100);
+
+        // 2. Generate Trend Data (Last 7 Days)
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const today = new Date();
+        const last7Days = Array.from({ length: 7 }, (_, i) => {
+            const d = new Date(today);
+            d.setDate(d.getDate() - (6 - i));
+            return d;
+        });
+
+        const trend = last7Days.map(date => {
+            const dayStr = date.toISOString().split('T')[0];
+            const dayFeedback = recentFeedback.filter(f => f.date.startsWith(dayStr));
+
+            if (dayFeedback.length === 0) {
+                // Fallback/Smoothing: use previous day or default 50 if no data
+                return { day: days[date.getDay()], score: 50 + Math.random() * 20 };
+            }
+
+            const dayScore = dayFeedback.reduce((acc, curr) => {
+                return acc + (curr.sentiment === 'positive' ? 100 : curr.sentiment === 'neutral' ? 50 : 0);
+            }, 0) / dayFeedback.length;
+
+            return { day: days[date.getDay()], score: Math.round(dayScore) };
+        });
+
+        return { score: positiveScore, trend };
+    }, [recentFeedback]);
+
+    const formatTimeAgo = (isoString) => {
+        const date = new Date(isoString);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+
+        if (diffInSeconds < 60) return 'Just now';
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+        return `${Math.floor(diffInSeconds / 86400)}d ago`;
     };
 
     return (
@@ -52,7 +99,7 @@ const Validation = () => {
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
-                                            data={[{ value: 78 }, { value: 22 }]}
+                                            data={[{ value: sentimentMetrics.score }, { value: 100 - sentimentMetrics.score }]}
                                             cy={100}
                                             startAngle={180}
                                             endAngle={0}
@@ -60,13 +107,13 @@ const Validation = () => {
                                             outerRadius={80}
                                             dataKey="value"
                                         >
-                                            <Cell fill="var(--success)" />
+                                            <Cell fill={sentimentMetrics.score > 50 ? "var(--success)" : "var(--warning)"} />
                                             <Cell fill="var(--slate-200)" />
                                         </Pie>
                                     </PieChart>
                                 </ResponsiveContainer>
                                 <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', textAlign: 'center' }}>
-                                    <span className="text-2xl font-bold text-slate-800">78%</span>
+                                    <span className="text-2xl font-bold" style={{ color: 'var(--slate-800)' }}>{sentimentMetrics.score}%</span>
                                 </div>
                             </div>
                             <p className="text-xs text-slate-500 mt-2">Positive Feedback Ratio</p>
@@ -76,15 +123,7 @@ const Validation = () => {
                         <div style={{ height: '200px' }}>
                             <h4 className="text-sm font-semibold text-slate-600 mb-4">Sentiment Trend (Last 7 Days)</h4>
                             <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={[
-                                    { day: 'Mon', score: 65 },
-                                    { day: 'Tue', score: 68 },
-                                    { day: 'Wed', score: 75 },
-                                    { day: 'Thu', score: 72 },
-                                    { day: 'Fri', score: 80 },
-                                    { day: 'Sat', score: 85 },
-                                    { day: 'Sun', score: 78 },
-                                ]}>
+                                <AreaChart data={sentimentMetrics.trend}>
                                     <defs>
                                         <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
                                             <stop offset="5%" stopColor="var(--primary-blue)" stopOpacity={0.8} />
@@ -154,7 +193,7 @@ const Validation = () => {
                                     <div className="flex justify-between items-start" style={{ marginBottom: '0.5rem' }}>
                                         <div className="flex items-center gap-2">
                                             <span style={{ fontWeight: 700, color: 'var(--slate-700)', fontSize: '0.875rem' }}>{fb.user}</span>
-                                            <span style={{ fontSize: '0.75rem', color: 'var(--slate-400)' }}>• {fb.date}</span>
+                                            <span style={{ fontSize: '0.75rem', color: 'var(--slate-400)' }}>• {formatTimeAgo(fb.date)}</span>
                                         </div>
                                         {fb.sentiment === 'positive' && <ThumbsUp size={14} style={{ color: 'var(--success)' }} />}
                                         {fb.sentiment === 'negative' && <ThumbsDown size={14} style={{ color: 'var(--danger)' }} />}

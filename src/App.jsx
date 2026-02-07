@@ -30,9 +30,11 @@ function App() {
     { id: 104, label: 'Pricing', value: 65, sentiment: 'positive' },
   ]);
   const [recentFeedback, setRecentFeedback] = React.useState([
-    { id: 1, user: 'Sarah J.', comment: "Love the new dashboard layout!", sentiment: 'positive', date: '2h ago' },
-    { id: 2, user: 'Mike T.', comment: "Can't find the export button.", sentiment: 'negative', date: '5h ago' },
-    { id: 3, user: 'Alex R.', comment: "It's okay, but needs dark mode.", sentiment: 'neutral', date: '1d ago' },
+    { id: 1, user: 'Sarah J.', comment: "Love the new dashboard layout!", sentiment: 'positive', date: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString() }, // 2 hours ago
+    { id: 2, user: 'Mike T.', comment: "Can't find the export button.", sentiment: 'negative', date: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString() }, // 5 hours ago
+    { id: 3, user: 'Alex R.', comment: "It's okay, but needs dark mode.", sentiment: 'neutral', date: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString() }, // 1 day ago
+    { id: 4, user: 'Emily W.', comment: "Great potential, features are solid.", sentiment: 'positive', date: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString() }, // 2 days ago
+    { id: 5, user: 'David K.', comment: "Loading is a bit slow.", sentiment: 'negative', date: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString() }, // 3 days ago
   ]);
 
   // Recent Activity Log
