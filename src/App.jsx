@@ -107,6 +107,16 @@ function App() {
     setTeamMembers(prev => [...prev, member]);
   };
 
+  const updateTeamMember = (id, updatedData) => {
+    setTeamMembers(prev => prev.map(member =>
+      member.id === id ? { ...member, ...updatedData } : member
+    ));
+  };
+
+  const removeTeamMember = (id) => {
+    setTeamMembers(prev => prev.filter(member => member.id !== id));
+  };
+
   // Dynamic Runway Calculation: Cash / (Burn - MRR)
   const netBurn = financialData.monthlyBurn - financialData.mrr;
   const runwayMonths = netBurn <= 0 ? 999 : Math.round(financialData.bankBalance / netBurn);
@@ -131,7 +141,9 @@ function App() {
       removeExpense,
       // Team State
       teamMembers,
-      addTeamMember
+      addTeamMember,
+      updateTeamMember,
+      removeTeamMember
     }}>
       <Routes>
         <Route path="/validate/:id" element={<PublicValidation />} />
