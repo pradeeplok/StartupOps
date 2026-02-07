@@ -642,7 +642,7 @@ button {
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12rem;
+  gap: 4rem;
 }
 
 @media (min-width: 1024px) {
