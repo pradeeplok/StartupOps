@@ -1,24 +1,86 @@
 import React from 'react';
-import { IndianRupee, TrendingDown, TrendingUp, AlertCircle, PieChart, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { IndianRupee, TrendingDown, TrendingUp, AlertCircle, PieChart, ArrowDownRight, Edit2, Check, X } from 'lucide-react';
+import { UserContext } from '../App';
 
 const Finance = () => {
-    // Mock Data
-    const financialData = {
-        bankBalance: 124500,
-        monthlyBurn: 15500,
-        mrr: 4200,
-        runwayMonths: 8,
-        expenses: [
-            { id: 1, category: 'Hosting', merchant: 'AWS Services', amount: 450, date: 'Oct 24', status: 'posted' },
-            { id: 2, category: 'Payroll', merchant: 'Gusto', amount: 8500, date: 'Oct 22', status: 'posted' },
-            { id: 3, category: 'Software', merchant: 'Slack', amount: 250, date: 'Oct 20', status: 'posted' },
-            { id: 4, category: 'Marketing', merchant: 'Google Ads', amount: 1200, date: 'Oct 18', status: 'pending' },
-            { id: 5, category: 'Software', merchant: 'Notion', amount: 50, date: 'Oct 15', status: 'posted' },
-        ]
-    };
+    const { financialData, updateFinancialData, runwayMonths, userRole } = React.useContext(UserContext);
+    const [editingField, setEditingField] = React.useState(null); // 'bankBalance', 'monthlyBurn', 'mrr'
+    const [tempValue, setTempValue] = React.useState('');
+
+    // Mock Expenses (Static for now)
+    const expenses = [
+        { id: 1, category: 'Hosting', merchant: 'AWS Services', amount: 450, date: 'Oct 24', status: 'posted' },
+        { id: 2, category: 'Payroll', merchant: 'Gusto', amount: 8500, date: 'Oct 22', status: 'posted' },
+        { id: 3, category: 'Software', merchant: 'Slack', amount: 250, date: 'Oct 20', status: 'posted' },
+        { id: 4, category: 'Marketing', merchant: 'Google Ads', amount: 1200, date: 'Oct 18', status: 'pending' },
+        { id: 5, category: 'Software', merchant: 'Notion', amount: 50, date: 'Oct 15', status: 'posted' },
+    ];
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
+    };
+
+    const startEditing = (field, currentValue) => {
+        setEditingField(field);
+        setTempValue(currentValue);
+    };
+
+    const saveEdit = () => {
+        if (tempValue && !isNaN(tempValue)) {
+            updateFinancialData(editingField, tempValue);
+        }
+        setEditingField(null);
+    };
+
+    const cancelEdit = () => {
+        setEditingField(null);
+    };
+
+    // Helper Component for Editable Stat
+    const EditableStat = ({ label, field, value, icon: Icon, colorClass }) => {
+        const isEditing = editingField === field;
+
+        return (
+            <div className={`stat-card ${field === 'runway' && value < 6 ? 'border-red-200 bg-red-50' : ''}`}>
+                <div className={`stat-icon ${colorClass}`}>
+                    <Icon size={24} />
+                </div>
+                <div style={{ flex: 1 }}>
+                    {isEditing ? (
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="number"
+                                autoFocus
+                                value={tempValue}
+                                onChange={(e) => setTempValue(e.target.value)}
+                                style={{
+                                    width: '100%', padding: '0.25rem', fontSize: '1.25rem', fontWeight: 700,
+                                    border: '1px solid var(--primary-blue)', borderRadius: '4px', outline: 'none'
+                                }}
+                            />
+                            <button onClick={saveEdit} className="text-green-600 hover:text-green-700"><Check size={20} /></button>
+                            <button onClick={cancelEdit} className="text-red-500 hover:text-red-600"><X size={20} /></button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center justify-between">
+                            <div className={`stat-value ${field === 'runway' && value < 6 ? 'text-red-600' : ''}`}>
+                                {field === 'runway' ? `${value} Months` : formatCurrency(value)}
+                            </div>
+                            {userRole === 'founder' && field !== 'runway' && (
+                                <button
+                                    onClick={() => startEditing(field, value)}
+                                    className="p-1 text-slate-400 hover:text-primary-blue transition-colors"
+                                    title="Edit Value"
+                                >
+                                    <Edit2 size={14} />
+                                </button>
+                            )}
+                        </div>
+                    )}
+                    <div className="stat-label">{label}</div>
+                </div>
+            </div>
+        );
     };
 
     return (
@@ -40,45 +102,34 @@ const Finance = () => {
 
             {/* Top Metrics Grid */}
             <div className="stats-grid" style={{ marginBottom: '2rem' }}>
-                <div className="stat-card">
-                    <div className="stat-icon blue">
-                        <IndianRupee size={24} />
-                    </div>
-                    <div>
-                        <div className="stat-value">{formatCurrency(financialData.bankBalance)}</div>
-                        <div className="stat-label">Total Cash</div>
-                    </div>
-                </div>
-
-                <div className="stat-card">
-                    <div className="stat-icon orange">
-                        <TrendingDown size={24} />
-                    </div>
-                    <div>
-                        <div className="stat-value">{formatCurrency(financialData.monthlyBurn)}</div>
-                        <div className="stat-label">Monthly Burn</div>
-                    </div>
-                </div>
-
-                <div className="stat-card">
-                    <div className="stat-icon green">
-                        <TrendingUp size={24} />
-                    </div>
-                    <div>
-                        <div className="stat-value">{formatCurrency(financialData.mrr)}</div>
-                        <div className="stat-label">MRR (Revenue)</div>
-                    </div>
-                </div>
-
-                <div className={`stat-card ${financialData.runwayMonths < 6 ? 'border-red-200 bg-red-50' : ''}`}>
-                    <div className="stat-icon purple">
-                        <PieChart size={24} />
-                    </div>
-                    <div>
-                        <div className={`stat-value ${financialData.runwayMonths < 6 ? 'text-red-600' : ''}`}>{financialData.runwayMonths} Months</div>
-                        <div className="stat-label">Runway Left</div>
-                    </div>
-                </div>
+                <EditableStat
+                    label="Total Cash"
+                    field="bankBalance"
+                    value={financialData.bankBalance}
+                    icon={IndianRupee}
+                    colorClass="blue"
+                />
+                <EditableStat
+                    label="Monthly Burn"
+                    field="monthlyBurn"
+                    value={financialData.monthlyBurn}
+                    icon={TrendingDown}
+                    colorClass="orange"
+                />
+                <EditableStat
+                    label="MRR (Revenue)"
+                    field="mrr"
+                    value={financialData.mrr}
+                    icon={TrendingUp}
+                    colorClass="green"
+                />
+                <EditableStat
+                    label="Runway Left"
+                    field="runway"
+                    value={runwayMonths}
+                    icon={PieChart}
+                    colorClass="purple"
+                />
             </div>
 
             <div className="grid-2">
@@ -108,7 +159,7 @@ const Finance = () => {
                 <div className="section-card">
                     <h3 className="column-title" style={{ marginBottom: '1.5rem' }}>Recent Expenses</h3>
                     <div className="flex flex-col gap-0">
-                        {financialData.expenses.map((expense) => (
+                        {expenses.map((expense) => (
                             <div key={expense.id} style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -142,7 +193,7 @@ const Finance = () => {
             </div>
 
             {/* Smart Alert */}
-            {financialData.runwayMonths < 9 && (
+            {runwayMonths < 9 && (
                 <div style={{ marginTop: '2rem', padding: '1rem', background: 'var(--bg-red-50)', border: '1px solid var(--danger-border)', borderRadius: '0.5rem', display: 'flex', alignItems: 'start', gap: '1rem' }}>
                     <AlertCircle className="text-red-600 shrink-0" />
                     <div>

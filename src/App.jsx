@@ -49,7 +49,23 @@ function App() {
     };
     setTasks(prev => [...prev, newTask]);
     alert("Feedback converted to Task and added to Roadmap!");
+    alert("Feedback converted to Task and added to Roadmap!");
   };
+
+  // --- Finance State & Logic ---
+  const [financialData, setFinancialData] = React.useState({
+    bankBalance: 124500,
+    monthlyBurn: 15500,
+    mrr: 4200
+  });
+
+  const updateFinancialData = (key, value) => {
+    setFinancialData(prev => ({ ...prev, [key]: Number(value) }));
+  };
+
+  // Dynamic Runway Calculation: Cash / (Burn - MRR)
+  const netBurn = financialData.monthlyBurn - financialData.mrr;
+  const runwayMonths = netBurn <= 0 ? 999 : Math.round(financialData.bankBalance / netBurn);
 
   return (
     <UserContext.Provider value={{
@@ -61,7 +77,11 @@ function App() {
       setFeedbackData,
       recentFeedback,
       setRecentFeedback,
-      addFeedbackToRoadmap
+      addFeedbackToRoadmap,
+      // Finance State
+      financialData,
+      updateFinancialData,
+      runwayMonths
     }}>
       <Routes>
         <Route path="/validate/:id" element={<PublicValidation />} />

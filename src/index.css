@@ -547,10 +547,9 @@ button {
   color: var(--slate-600);
 }
 
-.status-badge {
-  display: inline-flex;
-  items-center;
-  gap: 0.5rem;
+display: inline-flex;
+align-items: center;
+gap: 0.5rem;
 }
 
 .status-dot {
