@@ -1,11 +1,43 @@
 import React from 'react';
-import { IndianRupee, TrendingDown, TrendingUp, AlertCircle, PieChart, ArrowDownRight, Edit2, Check, X } from 'lucide-react';
+import {
+    IndianRupee, TrendingDown, TrendingUp, AlertCircle, PieChart, ArrowDownRight, Edit2, Check, X
+} from 'lucide-react';
+import {
+    ComposedChart, Line, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
 import { UserContext } from '../App';
 
 const Finance = () => {
     const { financialData, updateFinancialData, runwayMonths, userRole } = React.useContext(UserContext);
     const [editingField, setEditingField] = React.useState(null); // 'bankBalance', 'monthlyBurn', 'mrr'
     const [tempValue, setTempValue] = React.useState('');
+
+    // Generate Projection Data (Next 12 Months)
+    const generateProjection = () => {
+        const data = [];
+        let currentCash = financialData.bankBalance;
+        const netBurn = financialData.monthlyBurn - financialData.mrr;
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const currentMonthIndex = new Date().getMonth();
+
+        for (let i = 0; i < 12; i++) {
+            const monthLabel = monthNames[(currentMonthIndex + i) % 12];
+            // Simple projection: Cash decreases by net burn
+            // If profitable (Net Burn < 0), Cash increases.
+
+            data.push({
+                name: monthLabel,
+                Balance: Math.max(0, currentCash), // Don't show negative cash
+                Revenue: financialData.mrr,
+                Expenses: financialData.monthlyBurn
+            });
+
+            currentCash -= netBurn;
+        }
+        return data;
+    };
+
+    const projectionData = React.useMemo(() => generateProjection(), [financialData.bankBalance, financialData.monthlyBurn, financialData.mrr]);
 
     // Mock Expenses (Static for now)
     const expenses = [
@@ -133,25 +165,35 @@ const Finance = () => {
             </div>
 
             <div className="grid-2">
-                {/* Burn vs Revenue Chart (Simulated) */}
-                <div className="section-card">
+                {/* Dynamic Cash Flow Chart */}
+                <div className="section-card" style={{ display: 'block' }}>
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="column-title">Net Burn Projection</h3>
-                        <span className="text-sm text-slate-500">Last 6 Months</span>
+                        <h3 className="column-title">Runway Projection</h3>
+                        <span className="text-sm text-slate-500">Next 12 Months</span>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'flex-end', height: '200px', gap: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--slate-100)' }}>
-                        {[65, 70, 68, 75, 80, 85].map((h, i) => (
-                            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
-                                <div style={{ width: '100%', height: `${h}%`, background: 'var(--slate-200)', borderRadius: '4px' }}></div>
-                                <div style={{ width: '100%', height: `${h * 0.4}%`, background: 'var(--success)', borderRadius: '4px', marginTop: '-100%' }}></div>
-                                <span style={{ fontSize: '0.75rem', color: 'var(--slate-400)', marginTop: '0.5rem' }}>{['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'][i]}</span>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="flex justify-center gap-6 mt-4 text-xs font-medium text-slate-500">
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-200 rounded"></div> Expenses</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-green-500 rounded"></div> Revenue</div>
+                    <div style={{ width: '100%', height: 300 }}>
+                        <ResponsiveContainer>
+                            <ComposedChart data={projectionData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                                <YAxis hide />
+                                <Tooltip
+                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    formatter={(value) => formatCurrency(value)}
+                                />
+                                <Legend />
+                                <Bar dataKey="Revenue" barSize={10} fill="#22c55e" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="Expenses" barSize={10} fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                                <Area type="monotone" dataKey="Balance" stroke="#3b82f6" fillOpacity={1} fill="url(#colorBalance)" strokeWidth={2} />
+                            </ComposedChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
 
