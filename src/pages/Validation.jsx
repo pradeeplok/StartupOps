@@ -93,7 +93,7 @@ const Validation = () => {
                     </div>
                     <div className="grid-2">
                         {/* Sentiment Gauge */}
-                        <div className="flex flex-col items-center justify-center">
+                        <div className="flex flex-col items-center justify-center" style={{ minHeight: '220px' }}>
                             <h4 className="text-sm font-semibold text-slate-600 mb-4">Overall Sentiment Score</h4>
                             <div style={{ position: 'relative', width: '200px', height: '100px' }}>
                                 <ResponsiveContainer width="100%" height="100%">
@@ -120,9 +120,9 @@ const Validation = () => {
                         </div>
 
                         {/* Rating Trend */}
-                        <div style={{ height: '200px' }}>
+                        <div style={{ minHeight: '220px' }}>
                             <h4 className="text-sm font-semibold text-slate-600 mb-4">Sentiment Trend (Last 7 Days)</h4>
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height={180}>
                                 <AreaChart data={sentimentMetrics.trend}>
                                     <defs>
                                         <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
