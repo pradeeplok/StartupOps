@@ -40,6 +40,18 @@ function App() {
     { id: 1, text: "Project initialized", type: "system", timestamp: new Date(Date.now() - 86400000).toLocaleString() }
   ]);
 
+  // --- Theme State ---
+  const [theme, setTheme] = React.useState(() => localStorage.getItem('theme') || 'light');
+
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
   const logActivity = (text, type = 'system') => {
     const newActivity = {
       id: Date.now(),
@@ -154,6 +166,8 @@ function App() {
     <UserContext.Provider value={{
       userRole,
       toggleRole,
+      theme,
+      toggleTheme,
       tasks,
       setTasks,
       feedbackData,

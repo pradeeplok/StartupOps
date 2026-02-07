@@ -6,7 +6,7 @@ import { TrendingUp, Users, IndianRupee, Activity, Sparkles, Lightbulb, AlertTri
 import { UserContext } from '../App';
 
 const Dashboard = () => {
-    const { userRole, tasks, feedbackData, financialData, runwayMonths, recentActivities } = React.useContext(UserContext);
+    const { userRole, tasks, feedbackData, financialData, runwayMonths, recentActivities, theme } = React.useContext(UserContext);
     const navigate = useNavigate();
 
     // Calculate Health Score Metrics
@@ -31,9 +31,9 @@ const Dashboard = () => {
             insightsList.push({
                 type: 'warning',
                 icon: <AlertTriangle size={18} />,
-                color: '#dc2626', // red-600
-                bg: '#fef2f2',   // red-50
-                borderColor: '#ef4444', // red-500
+                color: 'var(--danger)', // red-600
+                bg: 'rgba(239, 68, 68, 0.1)',   // red-50
+                borderColor: 'var(--danger)', // red-500
                 title: 'Pivot Recommended',
                 description: `Validation Score is low (${validationScore}%). Re-evaluate core value proposition.`
             });
@@ -43,9 +43,9 @@ const Dashboard = () => {
             insightsList.push({
                 type: 'growth',
                 icon: <TrendingUp size={18} />,
-                color: '#16a34a', // green-600
-                bg: '#f0fdf4',   // green-50
-                borderColor: '#22c55e', // green-500
+                color: 'var(--text-green-600)', // green-600
+                bg: 'var(--bg-green-50)',   // green-50
+                borderColor: 'var(--text-green-600)', // green-500
                 title: 'Ready for Scale',
                 description: 'High validation and solid execution. Consider doubling marketing spend.'
             });
@@ -56,9 +56,9 @@ const Dashboard = () => {
             insightsList.push({
                 type: 'efficiency',
                 icon: <Lightbulb size={18} />,
-                color: '#2563eb', // blue-600
-                bg: '#eff6ff',   // blue-50
-                borderColor: '#3b82f6', // blue-500
+                color: 'var(--text-blue-600)', // blue-600
+                bg: 'var(--bg-blue-50)',   // blue-50
+                borderColor: 'var(--text-blue-600)', // blue-500
                 title: 'Optimize Runway',
                 description: `At current burn rate, runway is ${runwayMonths} months. Focus on closing deals this quarter.`
             });
@@ -87,8 +87,10 @@ const Dashboard = () => {
 
             {/* Founder's Playbook - Smart Action Cards */}
             <div style={{
-                background: 'linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%)',
-                border: '1px solid #dbeafe',
+                background: theme === 'dark'
+                    ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%)'
+                    : 'linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%)',
+                border: theme === 'dark' ? '1px solid var(--border-light)' : '1px solid #dbeafe',
                 borderRadius: '0.75rem',
                 padding: '1.5rem',
                 marginBottom: '2rem',
@@ -131,7 +133,7 @@ const Dashboard = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', animation: 'fadeIn 0.5s ease-in' }}>
                         {insights.map((insight, index) => (
                             <div key={index} style={{
-                                background: 'white',
+                                background: 'var(--bg-card)',
                                 padding: '1rem',
                                 borderRadius: '0.5rem',
                                 borderLeft: `4px solid ${insight.borderColor}`,
@@ -273,17 +275,17 @@ const Dashboard = () => {
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
                         {[
-                            { id: 'backlog', label: 'Backlog', icon: <CircleDashed size={20} />, color: 'var(--slate-500)', bg: 'var(--slate-50)' },
-                            { id: 'todo', label: 'To Do', icon: <ListTodo size={20} />, color: 'var(--accent-orange)', bg: '#fff7ed' },
-                            { id: 'in-progress', label: 'In Progress', icon: <Loader2 size={20} className="animate-spin-slow" />, color: 'var(--primary-blue)', bg: '#eff6ff' },
-                            { id: 'done', label: 'Done', icon: <CheckCircle2 size={20} />, color: 'var(--accent-teal)', bg: '#f0fdf4' }
+                            { id: 'backlog', label: 'Backlog', icon: <CircleDashed size={20} />, color: 'var(--slate-500)', bg: 'var(--slate-200)' },
+                            { id: 'todo', label: 'To Do', icon: <ListTodo size={20} />, color: 'var(--text-orange-600)', bg: 'var(--bg-orange-50)' },
+                            { id: 'in-progress', label: 'In Progress', icon: <Loader2 size={20} className="animate-spin-slow" />, color: 'var(--text-blue-600)', bg: 'var(--bg-blue-50)' },
+                            { id: 'done', label: 'Done', icon: <CheckCircle2 size={20} />, color: 'var(--text-green-600)', bg: 'var(--bg-green-50)' }
                         ].map((status) => {
                             const count = tasks.filter(t => t.status === status.id).length;
                             const percentage = Math.round((count / (tasks.length || 1)) * 100) || 0;
 
                             return (
                                 <div key={status.id} style={{
-                                    background: 'white',
+                                    background: 'var(--bg-card)',
                                     borderRadius: '0.75rem',
                                     padding: '1.25rem',
                                     border: '1px solid var(--border-light)',
@@ -352,8 +354,8 @@ const Dashboard = () => {
                                         fontSize: '0.75rem',
                                         fontWeight: 500,
                                         textTransform: 'uppercase',
-                                        color: activity.type === 'milestone' ? '#16a34a' : activity.type === 'status' ? '#ea580c' : '#2563eb',
-                                        backgroundColor: activity.type === 'milestone' ? '#f0fdf4' : activity.type === 'status' ? '#fff7ed' : '#eff6ff'
+                                        color: activity.type === 'milestone' ? 'var(--text-green-600)' : activity.type === 'status' ? 'var(--text-orange-600)' : 'var(--text-blue-600)',
+                                        backgroundColor: activity.type === 'milestone' ? 'var(--bg-green-50)' : activity.type === 'status' ? 'var(--bg-orange-50)' : 'var(--bg-blue-50)'
                                     }}>
                                         {activity.type}
                                     </div>

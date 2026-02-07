@@ -49,6 +49,44 @@
   --header-height: 64px;
 }
 
+[data-theme='dark'] {
+  /* Inverted Slate Palette */
+  --slate-50: #0f172a;
+  --slate-100: #1e293b;
+  --slate-200: #334155;
+  --slate-300: #475569;
+  --slate-400: #94a3b8;
+  --slate-500: #cbd5e1;
+  --slate-600: #e2e8f0;
+  --slate-700: #f1f5f9;
+  --slate-800: #f8fafc;
+  --slate-900: #ffffff;
+
+  /* UI Tokens */
+  --bg-app: #020617;
+  /* Extra dark for background */
+  --bg-card: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-light: #334155;
+
+  /* Adjust Accents for Dark Mode */
+  --bg-blue-50: rgba(59, 130, 246, 0.15);
+  --text-blue-600: #60a5fa;
+  --bg-green-50: rgba(34, 197, 94, 0.15);
+  --text-green-600: #4ade80;
+  --text-green-700: #22c55e;
+  --border-green-200: rgba(34, 197, 94, 0.3);
+  --bg-purple-50: rgba(139, 92, 246, 0.15);
+  --text-purple-600: #a78bfa;
+  --bg-orange-50: rgba(249, 115, 22, 0.15);
+  --text-orange-600: #fb923c;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -85,7 +123,7 @@ button {
 
 .sidebar {
   width: var(--sidebar-width);
-  background-color: #fff;
+  background-color: var(--bg-card);
   border-right: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
@@ -207,7 +245,7 @@ button {
 
 .top-header {
   height: var(--header-height);
-  background-color: #fff;
+  background-color: var(--bg-card);
   border-bottom: 1px solid var(--border-light);
   position: sticky;
   top: 0;

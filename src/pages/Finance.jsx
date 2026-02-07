@@ -146,7 +146,7 @@ const Finance = () => {
                     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
                     backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50
                 }}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '8px', width: '400px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                    <div style={{ background: 'var(--bg-card)', padding: '2rem', borderRadius: '8px', width: '400px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
                         <h3 className="text-lg font-bold mb-4">Add New Expense</h3>
                         <form onSubmit={handleAddExpense} className="flex flex-col gap-4">
                             <input
@@ -166,7 +166,8 @@ const Finance = () => {
                                 <select
                                     value={newExpense.frequency}
                                     onChange={e => setNewExpense({ ...newExpense, frequency: e.target.value })}
-                                    className="p-2 border rounded bg-white"
+                                    className="p-2 border rounded"
+                                    style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}
                                 >
                                     <option value="monthly">Monthly</option>
                                     <option value="one-time">One-time</option>
@@ -280,8 +281,8 @@ const Finance = () => {
                                             fontSize: '0.7rem',
                                             padding: '1px 6px',
                                             borderRadius: '4px',
-                                            backgroundColor: expense.frequency === 'monthly' ? '#eff6ff' : '#fff7ed',
-                                            color: expense.frequency === 'monthly' ? 'var(--primary-blue)' : 'var(--accent-orange)',
+                                            backgroundColor: expense.frequency === 'monthly' ? 'var(--bg-blue-50)' : 'var(--bg-orange-50)',
+                                            color: expense.frequency === 'monthly' ? 'var(--text-blue-600)' : 'var(--text-orange-600)',
                                             fontWeight: 500,
                                             textTransform: 'capitalize'
                                         }}>

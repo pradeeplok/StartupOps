@@ -1,11 +1,11 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Map, BarChart3, Users, Settings, LogOut, Presentation, DollarSign } from 'lucide-react';
+import { LayoutDashboard, Map, BarChart3, Users, Settings, LogOut, Presentation, DollarSign, Sun, Moon } from 'lucide-react';
 
 import { UserContext } from '../App';
 
 const Layout = () => {
-    const { userRole, toggleRole } = React.useContext(UserContext);
+    const { userRole, toggleRole, theme, toggleTheme } = React.useContext(UserContext);
 
     const allNavItems = [
         { label: 'Command Center', path: '/', icon: LayoutDashboard },
@@ -46,6 +46,10 @@ const Layout = () => {
                 </nav>
 
                 <div className="sidebar-footer">
+                    <button onClick={toggleTheme} className="footer-btn" style={{ marginBottom: '0.5rem', justifyContent: 'center' }}>
+                        {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+                        {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                    </button>
                     <button onClick={toggleRole} className="footer-btn" style={{ marginBottom: '0.5rem', background: 'var(--slate-100)', justifyContent: 'center', fontSize: '0.75rem' }}>
                         Switch to: {userRole === 'founder' ? 'Member' : 'Founder'}
                     </button>
