@@ -75,14 +75,19 @@ const Layout = () => {
                                 color: 'var(--slate-700)',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.5rem',
+                                justifyContent: 'center',
                                 transition: 'all 0.2s'
                             }}
                             onMouseEnter={(e) => e.currentTarget.style.background = 'var(--slate-200)'}
                             onMouseLeave={(e) => e.currentTarget.style.background = 'var(--slate-100)'}
                         >
-                            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-                            <span className="text-xs font-medium">{theme === 'light' ? 'Dark' : 'Light'}</span>
+                            <div style={{
+                                display: 'flex',
+                                animation: 'flipFade 0.6s ease-in-out',
+                                transformOrigin: 'center'
+                            }}>
+                                {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+                            </div>
                         </button>
                         <div className="user-avatar"></div>
                     </div>
