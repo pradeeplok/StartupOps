@@ -24,7 +24,7 @@ const Login = () => {
             const user = userCredential.user;
 
             // Navigate to dashboard
-            navigate('/');
+            navigate('/dashboard');
         } catch (error) {
             console.error('Login error:', error);
             let errorMessage = 'Failed to sign in';
@@ -60,7 +60,7 @@ const Login = () => {
             const user = result.user;
 
             // Navigate to dashboard
-            navigate('/');
+            navigate('/dashboard');
         } catch (error) {
             console.error('Google login error:', error);
             let errorMessage = 'Failed to sign in with Google';
