@@ -22,49 +22,90 @@ const Dashboard = () => {
     // Weighted Health Score: 60% Validation, 40% Execution
     const healthScore = Math.round((validationScore * 0.6) + (executionScore * 0.4));
 
-    // Dynamic AI Insights - Using Inline Styles for Colors
+    // Dynamic AI Insights - Advanced Heuristics
     const generateInsights = () => {
         const insightsList = [];
 
-        // Pivot Warning Rule
-        if (validationScore < 50) {
+        // 1. EMERGENCY: Runway Danger (Highest Priority)
+        if (runwayMonths < 3) {
+            insightsList.push({
+                type: 'danger',
+                icon: <AlertTriangle size={18} />,
+                color: 'var(--danger)',
+                bg: 'rgba(239, 68, 68, 0.1)',
+                borderColor: 'var(--danger)',
+                title: 'Runway Critical',
+                description: `You have ${runwayMonths} months of cash left. Immediate fundraising or severe cost-cutting is required.`
+            });
+            return insightsList; // Stop here, this is critical
+        }
+
+        // 2. TRAP: The Scaling Trap (High Execution, Low Validation)
+        if (executionScore > 80 && validationScore < 40) {
             insightsList.push({
                 type: 'warning',
-                icon: <AlertTriangle size={18} />,
-                color: 'var(--danger)', // red-600
-                bg: 'rgba(239, 68, 68, 0.1)',   // red-50
-                borderColor: 'var(--danger)', // red-500
-                title: 'Pivot Recommended',
-                description: `Validation Score is low (${validationScore}%). Re-evaluate core value proposition.`
+                icon: <Activity size={18} />,
+                color: 'var(--text-orange-600)',
+                bg: 'var(--bg-orange-50)',
+                borderColor: 'var(--text-orange-600)',
+                title: 'The Scaling Trap',
+                description: "STOP BUILDING. You are efficiently shipping a product that hasn't been validated. Shift 100% focus to customer interviews."
             });
         }
-        // Growth Signal Rule
-        else if (validationScore > 75 && executionScore > 60) {
+
+        // 3. TRAP: Feature Factory (High Burn, Low Validation)
+        if (financialData.monthlyBurn > 20000 && validationScore < 50) {
+            insightsList.push({
+                type: 'warning',
+                icon: <IndianRupee size={18} />,
+                color: 'var(--text-orange-600)',
+                bg: 'var(--bg-orange-50)',
+                borderColor: 'var(--text-orange-600)',
+                title: 'Burn Alert',
+                description: "High burn rate with unproven value. Cut non-essential costs immediately until validation improves."
+            });
+        }
+
+        // 4. TRAP: Idea Maze (Low Everything)
+        if (executionScore < 30 && validationScore < 30) {
+            insightsList.push({
+                type: 'info',
+                icon: <Lightbulb size={18} />,
+                color: 'var(--text-blue-600)',
+                bg: 'var(--bg-blue-50)',
+                borderColor: 'var(--text-blue-600)',
+                title: 'The Idea Maze',
+                description: "Don't worry about code yet. Talk to 10 potential customers this week to find a hair-on-fire problem."
+            });
+        }
+
+        // 5. SUCCESS: Product-Market Fit (High Everything)
+        if (validationScore > 80 && executionScore > 70) {
             insightsList.push({
                 type: 'growth',
                 icon: <TrendingUp size={18} />,
-                color: 'var(--text-green-600)', // green-600
-                bg: 'var(--bg-green-50)',   // green-50
-                borderColor: 'var(--text-green-600)', // green-500
-                title: 'Ready for Scale',
-                description: 'High validation and solid execution. Consider doubling marketing spend.'
+                color: 'var(--text-green-600)',
+                bg: 'var(--bg-green-50)',
+                borderColor: 'var(--text-green-600)',
+                title: 'Product-Market Fit',
+                description: " signals are strong. Double down on what works and consider hiring for sales/growth."
             });
         }
 
-        // Standard Advice if no alerts
+        // Default Advice if no specific patterns match
         if (insightsList.length === 0) {
             insightsList.push({
                 type: 'efficiency',
-                icon: <Lightbulb size={18} />,
-                color: 'var(--text-blue-600)', // blue-600
-                bg: 'var(--bg-blue-50)',   // blue-50
-                borderColor: 'var(--text-blue-600)', // blue-500
-                title: 'Optimize Runway',
-                description: `At current burn rate, runway is ${runwayMonths} months. Focus on closing deals this quarter.`
+                icon: <Sparkles size={18} />,
+                color: 'var(--text-blue-600)',
+                bg: 'var(--bg-blue-50)',
+                borderColor: 'var(--text-blue-600)',
+                title: 'Optimize & Validate',
+                description: `Healthy balance. improved validation (${validationScore}%) will unlock clearer next steps.`
             });
         }
 
-        return insightsList;
+        return insightsList.slice(0, 2); // Show max 2 insights
     };
 
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
