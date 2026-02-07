@@ -583,6 +583,11 @@ gap: 0.5rem;
   display: flex;
 }
 
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
 .items-center {
   align-items: center;
 }

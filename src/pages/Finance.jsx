@@ -220,13 +220,14 @@ const Finance = () => {
                 {/* Recent Transactions */}
                 <div className="section-card">
                     <h3 className="column-title" style={{ marginBottom: '1.5rem' }}>Recent Expenses</h3>
-                    <div className="flex flex-col gap-0">
+                    <div className="flex-col gap-0 w-full">
                         {expenses.map((expense) => (
                             <div key={expense.id} className="group" style={{ // Added group for hover effect
                                 display: 'flex',
                                 alignItems: 'center',
-                                padding: '1rem 0',
-                                borderBottom: '1px solid var(--slate-100)'
+                                padding: '1rem 0.5rem',
+                                borderBottom: '1px solid var(--slate-100)',
+                                transition: 'background-color 0.2s'
                             }}>
                                 <div style={{
                                     width: '40px',
@@ -251,7 +252,7 @@ const Finance = () => {
                                     {userRole === 'founder' && (
                                         <button
                                             onClick={() => removeExpense(expense.id)}
-                                            className="text-slate-300 hover:text-red-500 transition-colors"
+                                            className="text-slate-300 hover:text-red-500 transition-colors p-1 rounded hover:bg-red-50"
                                             title="Remove Expense"
                                         >
                                             <X size={16} />
@@ -260,7 +261,7 @@ const Finance = () => {
                                 </div>
                             </div>
                         ))}
-                        {expenses.length === 0 && <div className="text-center py-4 text-slate-400">No expenses recorded.</div>}
+                        {expenses.length === 0 && <div className="text-center py-8 text-slate-400">No expenses recorded.</div>}
                         <button className="btn btn-secondary w-full mt-4">View All Transactions</button>
                     </div>
                 </div>
