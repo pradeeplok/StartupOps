@@ -1,13 +1,14 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Map, BarChart3, Users, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Map, BarChart3, Users, Settings, LogOut, Presentation } from 'lucide-react';
 
 const Layout = () => {
     const navItems = [
         { label: 'Command Center', path: '/', icon: LayoutDashboard },
         { label: 'Execution Roadmap', path: '/roadmap', icon: Map },
-        { label: 'Validation Engine', path: '/validation', icon: BarChart3 },
+        { label: 'Recommendation Engine', path: '/recommendation', icon: BarChart3 },
         { label: 'Team & Roles', path: '/team', icon: Users },
+        { label: 'Pitch Generator', path: '/pitch', icon: Presentation },
     ];
 
     return (

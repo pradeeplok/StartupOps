@@ -36,8 +36,8 @@ const Validation = () => {
         <div style={{ maxWidth: '1152px', margin: '0 auto' }}>
             <div className="page-header flex">
                 <div>
-                    <h1 className="page-heading">Validation Engine</h1>
-                    <p className="page-subheading">Track customer feedback and validate business hypotheses.</p>
+                    <h1 className="page-heading">Recommendation Engine</h1>
+                    <p className="page-subheading">AI-driven insights and customer feedback analysis.</p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-green-50)', color: 'var(--text-green-700)', padding: '0.5rem 1rem', borderRadius: '9999px', border: '1px solid var(--border-green-200)' }}>
                     <Target size={20} />

@@ -1,13 +1,87 @@
 import React from 'react';
 import CircularProgress from '../components/CircularProgress';
-import { TrendingUp, Users, DollarSign, Activity } from 'lucide-react';
+import { TrendingUp, Users, DollarSign, Activity, Sparkles, Lightbulb, AlertTriangle } from 'lucide-react';
 
 const Dashboard = () => {
+    // Simulated AI Rules
+    const insights = [
+        {
+            type: 'growth',
+            icon: <TrendingUp size={18} />,
+            color: 'text-green-600',
+            bg: 'bg-green-50',
+            title: 'Growth Opportunity detected',
+            description: 'User signups spiked 18% this week. Consider launching a referral program to sustain momentum.'
+        },
+        {
+            type: 'validation',
+            icon: <AlertTriangle size={18} />,
+            color: 'text-amber-600',
+            bg: 'bg-amber-50',
+            title: 'Validation Gap',
+            description: 'Problem Fit score is high (60%), but Solution Fit is lagging (35%). Recommend scheduling 5 user demos.'
+        },
+        {
+            type: 'efficiency',
+            icon: <Lightbulb size={18} />,
+            color: 'text-blue-600',
+            bg: 'bg-blue-50',
+            title: 'Runway Optimization',
+            description: 'At current burn rate, runway is 8 months. Prepare Series A pitch deck by end of Q3.'
+        }
+    ];
+
     return (
         <div>
             <div className="page-header">
                 <h1 className="page-heading">Founder's Command Center</h1>
                 <p className="page-subheading">Real-time overview of your startup's health and progress.</p>
+            </div>
+
+            {/* AI Insights Banner */}
+            <div style={{
+                background: 'linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%)',
+                border: '1px solid #dbeafe',
+                borderRadius: '0.75rem',
+                padding: '1.5rem',
+                marginBottom: '2rem',
+                position: 'relative',
+                overflow: 'hidden'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                    <div style={{
+                        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                        color: 'white',
+                        padding: '0.5rem',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.3)'
+                    }}>
+                        <Sparkles size={20} />
+                    </div>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--slate-800)' }}>AI Strategic Insights</h3>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+                    {insights.map((insight, index) => (
+                        <div key={index} style={{
+                            background: 'white',
+                            padding: '1rem',
+                            borderRadius: '0.5rem',
+                            border: '1px solid rgba(0,0,0,0.05)',
+                            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <div className={`p-1.5 rounded ${insight.bg} ${insight.color}`}>
+                                    {insight.icon}
+                                </div>
+                                <span style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--slate-700)' }}>{insight.title}</span>
+                            </div>
+                            <p style={{ fontSize: '0.875rem', color: 'var(--slate-600)', lineHeight: 1.5 }}>
+                                {insight.description}
+                            </p>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             <div className="stats-grid">
