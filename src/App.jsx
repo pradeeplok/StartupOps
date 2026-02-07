@@ -80,21 +80,28 @@ function App() {
 
   // --- Expense Logic ---
   const [expenses, setExpenses] = React.useState([
-    { id: 1, category: 'Hosting', merchant: 'AWS Services', amount: 450, date: 'Oct 24', status: 'posted' },
-    { id: 2, category: 'Payroll', merchant: 'Gusto', amount: 8500, date: 'Oct 22', status: 'posted' },
-    { id: 3, category: 'Software', merchant: 'Slack', amount: 250, date: 'Oct 20', status: 'posted' },
-    { id: 4, category: 'Marketing', merchant: 'Google Ads', amount: 1200, date: 'Oct 18', status: 'pending' },
-    { id: 5, category: 'Software', merchant: 'Notion', amount: 50, date: 'Oct 15', status: 'posted' },
+    { id: 1, category: 'Hosting', merchant: 'AWS Services', amount: 450, date: 'Feb 05', status: 'posted', frequency: 'monthly' },
+    { id: 2, category: 'Payroll', merchant: 'Gusto', amount: 8500, date: 'Feb 01', status: 'posted', frequency: 'monthly' },
+    { id: 3, category: 'Software', merchant: 'Slack', amount: 250, date: 'Jan 20', status: 'posted', frequency: 'monthly' },
+    { id: 4, category: 'Marketing', merchant: 'Google Ads', amount: 1200, date: 'Jan 18', status: 'posted', frequency: 'one-time' },
+    { id: 5, category: 'Software', merchant: 'Notion', amount: 50, date: 'Dec 15', status: 'posted', frequency: 'monthly' },
   ]);
 
   const addExpense = (newExpense) => {
     // 1. Add to list
     setExpenses(prev => [newExpense, ...prev]);
-    // 2. Increase Burn
-    setFinancialData(prev => ({
-      ...prev,
-      monthlyBurn: prev.monthlyBurn + Number(newExpense.amount)
-    }));
+
+    // 2. Adjust Financials based on Frequency
+    setFinancialData(prev => {
+      const amount = Number(newExpense.amount);
+      if (newExpense.frequency === 'monthly') {
+        return { ...prev, monthlyBurn: prev.monthlyBurn + amount };
+      } else {
+        return { ...prev, bankBalance: prev.bankBalance - amount };
+      }
+    });
+
+    logActivity(`Added ${newExpense.frequency} expense: ${newExpense.merchant} (-₹${newExpense.amount})`, 'finance');
   };
 
   const removeExpense = (id) => {
@@ -103,11 +110,18 @@ function App() {
 
     // 1. Remove from list
     setExpenses(prev => prev.filter(e => e.id !== id));
-    // 2. Decrease Burn
-    setFinancialData(prev => ({
-      ...prev,
-      monthlyBurn: Math.max(0, prev.monthlyBurn - Number(expense.amount))
-    }));
+
+    // 2. Revert Financials
+    setFinancialData(prev => {
+      const amount = Number(expense.amount);
+      if (expense.frequency === 'monthly') {
+        return { ...prev, monthlyBurn: Math.max(0, prev.monthlyBurn - amount) };
+      } else {
+        return { ...prev, bankBalance: prev.bankBalance + amount };
+      }
+    });
+
+    logActivity(`Removed expense: ${expense.merchant}`, 'finance');
   };
 
   // --- Team State ---

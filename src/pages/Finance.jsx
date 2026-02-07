@@ -15,7 +15,8 @@ const Finance = () => {
     const [editingField, setEditingField] = React.useState(null);
     const [tempValue, setTempValue] = React.useState('');
     const [showAddExpense, setShowAddExpense] = React.useState(false);
-    const [newExpense, setNewExpense] = React.useState({ merchant: '', category: '', amount: '' });
+    const [newExpense, setNewExpense] = React.useState({ merchant: '', category: '', amount: '', frequency: 'monthly' });
+    const [viewMode, setViewMode] = React.useState('current'); // 'current' | 'all'
 
     // Generate Projection Data (Next 12 Months)
     const generateProjection = () => {
@@ -70,9 +71,10 @@ const Finance = () => {
             category: newExpense.category || 'General',
             amount: Number(newExpense.amount),
             date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-            status: 'pending'
+            status: 'pending',
+            frequency: newExpense.frequency
         });
-        setNewExpense({ merchant: '', category: '', amount: '' });
+        setNewExpense({ merchant: '', category: '', amount: '', frequency: 'monthly' });
         setShowAddExpense(false);
     };
 
@@ -154,12 +156,22 @@ const Finance = () => {
                                 className="p-2 border rounded"
                                 autoFocus
                             />
-                            <input
-                                placeholder="Category (e.g. Infrastructure)"
-                                value={newExpense.category}
-                                onChange={e => setNewExpense({ ...newExpense, category: e.target.value })}
-                                className="p-2 border rounded"
-                            />
+                            <div className="flex gap-2">
+                                <input
+                                    placeholder="Category (e.g. Infrastructure)"
+                                    value={newExpense.category}
+                                    onChange={e => setNewExpense({ ...newExpense, category: e.target.value })}
+                                    className="p-2 border rounded flex-1"
+                                />
+                                <select
+                                    value={newExpense.frequency}
+                                    onChange={e => setNewExpense({ ...newExpense, frequency: e.target.value })}
+                                    className="p-2 border rounded bg-white"
+                                >
+                                    <option value="monthly">Monthly</option>
+                                    <option value="one-time">One-time</option>
+                                </select>
+                            </div>
                             <input
                                 type="number"
                                 placeholder="Amount (e.g. 500)"
@@ -169,7 +181,9 @@ const Finance = () => {
                             />
                             <div className="flex justify-end gap-2 mt-2">
                                 <button type="button" onClick={() => setShowAddExpense(false)} className="px-4 py-2 text-slate-500">Cancel</button>
-                                <button type="submit" className="btn btn-primary">Add & Update Burn</button>
+                                <button type="submit" className="btn btn-primary">
+                                    {newExpense.frequency === 'monthly' ? 'Add & Update Burn' : 'Add & Deduct Cash'}
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -219,10 +233,27 @@ const Finance = () => {
 
                 {/* Recent Transactions */}
                 <div className="section-card">
-                    <h3 className="column-title" style={{ marginBottom: '1.5rem' }}>Recent Expenses</h3>
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="column-title" style={{ marginBottom: 0 }}>Recent Expenses</h3>
+                        <div className="flex gap-2">
+                            <select
+                                className="text-sm border-none bg-slate-50 text-slate-500 font-medium focus:ring-0 cursor-pointer"
+                                value={viewMode}
+                                onChange={(e) => setViewMode(e.target.value)}
+                            >
+                                <option value="current">This Month</option>
+                                <option value="all">All History</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div className="flex-col gap-0 w-full">
-                        {expenses.map((expense) => (
-                            <div key={expense.id} className="group" style={{ // Added group for hover effect
+                        {expenses.filter(expense => {
+                            if (viewMode === 'all') return true;
+                            const currentMonth = new Date().toLocaleString('default', { month: 'short' });
+                            return expense.date.includes(currentMonth);
+                        }).map((expense) => (
+                            <div key={expense.id} className="group" style={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 padding: '1rem 0.5rem',
@@ -243,7 +274,20 @@ const Finance = () => {
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <div style={{ fontWeight: 600, color: 'var(--slate-800)' }}>{expense.merchant}</div>
-                                    <div style={{ fontSize: '0.875rem', color: 'var(--slate-500)' }}>{expense.category} • {expense.date}</div>
+                                    <div style={{ fontSize: '0.875rem', color: 'var(--slate-500)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <span>{expense.category} • {expense.date}</span>
+                                        <span style={{
+                                            fontSize: '0.7rem',
+                                            padding: '1px 6px',
+                                            borderRadius: '4px',
+                                            backgroundColor: expense.frequency === 'monthly' ? '#eff6ff' : '#fff7ed',
+                                            color: expense.frequency === 'monthly' ? 'var(--primary-blue)' : 'var(--accent-orange)',
+                                            fontWeight: 500,
+                                            textTransform: 'capitalize'
+                                        }}>
+                                            {expense.frequency}
+                                        </span>
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div style={{ fontWeight: 600, color: 'var(--slate-800)' }}>
@@ -261,8 +305,18 @@ const Finance = () => {
                                 </div>
                             </div>
                         ))}
-                        {expenses.length === 0 && <div className="text-center py-8 text-slate-400">No expenses recorded.</div>}
-                        <button className="btn btn-secondary w-full mt-4">View All Transactions</button>
+                        {expenses.filter(e => viewMode === 'all' || e.date.includes(new Date().toLocaleString('default', { month: 'short' }))).length === 0 && (
+                            <div className="text-center py-8 text-slate-400">No expenses for this period.</div>
+                        )}
+
+                        {viewMode === 'current' && (
+                            <button
+                                onClick={() => setViewMode('all')}
+                                className="btn w-full mt-4 text-slate-500 hover:text-primary-blue hover:bg-slate-50 text-sm font-medium transition-colors"
+                            >
+                                View All History
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
