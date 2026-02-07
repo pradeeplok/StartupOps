@@ -11,6 +11,7 @@ import PitchDeck from './pages/PitchDeck';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
+import LandingPage from './pages/LandingPage';
 
 import { initialTasks, columns as initialColumns, users } from './data/mockData';
 
@@ -236,6 +237,7 @@ function App() {
     }}>
       <Routes>
         {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/validate/:id" element={<PublicValidation />} />
@@ -243,7 +245,7 @@ function App() {
         <Route path="/report/investor" element={<InvestorReport />} />
 
         {/* Protected Routes */}
-        <Route path="/" element={
+        <Route path="/dashboard" element={
           <ProtectedRoute>
             <Layout />
           </ProtectedRoute>
@@ -255,7 +257,6 @@ function App() {
           <Route path="team" element={<Team />} />
           <Route path="pitch" element={<PitchDeck />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
     </UserContext.Provider>
