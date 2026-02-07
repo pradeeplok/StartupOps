@@ -547,10 +547,7 @@ button {
   color: var(--slate-600);
 }
 
-display: inline-flex;
-align-items: center;
-gap: 0.5rem;
-}
+
 
 .status-dot {
   width: 0.5rem;

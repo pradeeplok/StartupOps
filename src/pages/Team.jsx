@@ -1,13 +1,33 @@
 import React from 'react';
+import { UserContext } from '../App';
 import { Mail, MoreHorizontal, Shield, User } from 'lucide-react';
 
 const Team = () => {
-    const teamMembers = [
-        { id: 1, name: 'Alex Founder', role: 'Founder', email: 'alex@startupops.com', status: 'Active', tasks: 3, avatar: 'AF' },
-        { id: 2, name: 'Sarah Engineer', role: 'Member', email: 'sarah@startupops.com', status: 'Active', tasks: 5, avatar: 'SE' },
-        { id: 3, name: 'Mike Design', role: 'Member', email: 'mike@startupops.com', status: 'In Meeting', tasks: 2, avatar: 'MD' },
-        { id: 4, name: 'Emily Growth', role: 'Member', email: 'emily@startupops.com', status: 'Offline', tasks: 0, avatar: 'EG' },
-    ];
+    const { teamMembers, addTeamMember } = React.useContext(UserContext);
+    const [showModal, setShowModal] = React.useState(false);
+    const [newMember, setNewMember] = React.useState({ name: '', email: '', role: 'Member', customRole: '' });
+
+    const handleAddMember = (e) => {
+        e.preventDefault();
+        const roleToUse = newMember.role === 'Custom' ? newMember.customRole : newMember.role;
+        if (!newMember.name || !roleToUse) return;
+
+        addTeamMember({
+            id: Date.now(),
+            name: newMember.name,
+            email: newMember.email,
+            role: roleToUse,
+            status: 'Active',
+            tasks: 0,
+            avatar: newMember.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+        });
+        setShowModal(false);
+        setNewMember({ name: '', email: '', role: 'Member', customRole: '' });
+    };
+
+    const handleInvite = () => {
+        alert("Invitation email sent! 📧");
+    };
 
     return (
         <div style={{ maxWidth: '1024px', margin: '0 auto' }}>
@@ -16,8 +36,61 @@ const Team = () => {
                     <h1 className="page-heading">Team & Roles</h1>
                     <p className="page-subheading">Manage your squad and assignments.</p>
                 </div>
-                <button className="btn btn-primary">Invite Member</button>
+                <div className="flex gap-3">
+                    <button onClick={() => setShowModal(true)} className="btn btn-primary">Add Member</button>
+                    <button onClick={handleInvite} className="btn btn-secondary">Invite Member</button>
+                </div>
             </div>
+
+            {/* Add Member Modal */}
+            {showModal && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50
+                }}>
+                    <div style={{ background: 'white', padding: '2rem', borderRadius: '8px', width: '400px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                        <h3 className="text-lg font-bold mb-4">Add Team Member</h3>
+                        <form onSubmit={handleAddMember} className="flex flex-col gap-4">
+                            <input
+                                placeholder="Full Name"
+                                value={newMember.name}
+                                onChange={e => setNewMember({ ...newMember, name: e.target.value })}
+                                className="p-2 border rounded"
+                                autoFocus
+                            />
+                            <input
+                                placeholder="Email Address"
+                                value={newMember.email}
+                                onChange={e => setNewMember({ ...newMember, email: e.target.value })}
+                                className="p-2 border rounded"
+                            />
+                            <select
+                                value={newMember.role}
+                                onChange={e => setNewMember({ ...newMember, role: e.target.value })}
+                                className="p-2 border rounded"
+                            >
+                                <option value="Member">Member</option>
+                                <option value="Founder">Founder</option>
+                                <option value="Custom">Custom Role...</option>
+                            </select>
+
+                            {newMember.role === 'Custom' && (
+                                <input
+                                    placeholder="Enter Custom Role (e.g. Growth Hacker)"
+                                    value={newMember.customRole}
+                                    onChange={e => setNewMember({ ...newMember, customRole: e.target.value })}
+                                    className="p-2 border rounded border-blue-300 bg-blue-50"
+                                />
+                            )}
+
+                            <div className="flex justify-end gap-2 mt-2">
+                                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-slate-500">Cancel</button>
+                                <button type="submit" className="btn btn-primary">Add Member</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             <div className="data-table-card">
                 <table className="data-table">
@@ -59,9 +132,9 @@ const Team = () => {
                                     </div>
                                 </td>
                                 <td>
-                                    <div className="status-badge" style={{ fontSize: '0.875rem', color: 'var(--slate-600)' }}>
+                                    <div className="status-badge" style={{ fontSize: '0.875rem', color: 'var(--slate-600)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <div className={`status-dot ${member.status === 'Active' ? 'active' :
-                                                member.status === 'In Meeting' ? 'meeting' : 'offline'
+                                            member.status === 'In Meeting' ? 'meeting' : 'offline'
                                             }`}></div>
                                         {member.status}
                                     </div>

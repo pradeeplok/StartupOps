@@ -95,6 +95,18 @@ function App() {
     }));
   };
 
+  // --- Team State ---
+  const [teamMembers, setTeamMembers] = React.useState([
+    { id: 1, name: 'Alex Founder', role: 'Founder', email: 'alex@startupops.com', status: 'Active', tasks: 3, avatar: 'AF' },
+    { id: 2, name: 'Sarah Engineer', role: 'Member', email: 'sarah@startupops.com', status: 'Active', tasks: 5, avatar: 'SE' },
+    { id: 3, name: 'Mike Design', role: 'Member', email: 'mike@startupops.com', status: 'In Meeting', tasks: 2, avatar: 'MD' },
+    { id: 4, name: 'Emily Growth', role: 'Member', email: 'emily@startupops.com', status: 'Offline', tasks: 0, avatar: 'EG' },
+  ]);
+
+  const addTeamMember = (member) => {
+    setTeamMembers(prev => [...prev, member]);
+  };
+
   // Dynamic Runway Calculation: Cash / (Burn - MRR)
   const netBurn = financialData.monthlyBurn - financialData.mrr;
   const runwayMonths = netBurn <= 0 ? 999 : Math.round(financialData.bankBalance / netBurn);
@@ -116,7 +128,10 @@ function App() {
       runwayMonths,
       expenses,
       addExpense,
-      removeExpense
+      removeExpense,
+      // Team State
+      teamMembers,
+      addTeamMember
     }}>
       <Routes>
         <Route path="/validate/:id" element={<PublicValidation />} />
