@@ -90,7 +90,16 @@ const Roadmap = () => {
             <div className="roadmap-header">
                 <div>
                     <h1 className="page-heading">Execution Roadmap</h1>
-                    <p className="page-subheading">Manage tasks across milestones and execution stages.</p>
+                    <div className="flex items-center gap-3">
+                        <p className="page-subheading" style={{ marginBottom: 0 }}>Manage tasks across milestones and execution stages.</p>
+                        <span className="flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                            Live Sync Active
+                        </span>
+                    </div>
                 </div>
                 <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
                     <Plus size={18} />

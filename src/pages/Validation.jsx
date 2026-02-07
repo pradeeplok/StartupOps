@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ThumbsUp, ThumbsDown, MessageSquare, ArrowRight, Target, Plus, X } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, CartesianGrid } from 'recharts';
 
 const Validation = () => {
     const [feedbackData, setFeedbackData] = useState([
@@ -46,6 +47,69 @@ const Validation = () => {
             </div>
 
             <div className="grid-2">
+                {/* Sentiment Analytics (New) */}
+                <div className="section-card" style={{ gridColumn: 'span 2' }}>
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="column-title">Sentiment Analysis & Trends</h3>
+                        <span className="text-sm text-slate-500">Live Data from last 30 days</span>
+                    </div>
+                    <div className="grid-2">
+                        {/* Sentiment Gauge */}
+                        <div className="flex flex-col items-center justify-center">
+                            <h4 className="text-sm font-semibold text-slate-600 mb-4">Overall Sentiment Score</h4>
+                            <div style={{ position: 'relative', width: '200px', height: '100px' }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={[{ value: 78 }, { value: 22 }]}
+                                            cy={100}
+                                            startAngle={180}
+                                            endAngle={0}
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            dataKey="value"
+                                        >
+                                            <Cell fill="var(--success)" />
+                                            <Cell fill="var(--slate-200)" />
+                                        </Pie>
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', textAlign: 'center' }}>
+                                    <span className="text-2xl font-bold text-slate-800">78%</span>
+                                </div>
+                            </div>
+                            <p className="text-xs text-slate-500 mt-2">Positive Feedback Ratio</p>
+                        </div>
+
+                        {/* Rating Trend */}
+                        <div style={{ height: '200px' }}>
+                            <h4 className="text-sm font-semibold text-slate-600 mb-4">Sentiment Trend (Last 7 Days)</h4>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={[
+                                    { day: 'Mon', score: 65 },
+                                    { day: 'Tue', score: 68 },
+                                    { day: 'Wed', score: 75 },
+                                    { day: 'Thu', score: 72 },
+                                    { day: 'Fri', score: 80 },
+                                    { day: 'Sat', score: 85 },
+                                    { day: 'Sun', score: 78 },
+                                ]}>
+                                    <defs>
+                                        <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="var(--primary-blue)" stopOpacity={0.8} />
+                                            <stop offset="95%" stopColor="var(--primary-blue)" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--slate-200)" />
+                                    <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--slate-500)' }} />
+                                    <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+                                    <Area type="monotone" dataKey="score" stroke="var(--primary-blue)" fillOpacity={1} fill="url(#colorScore)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Feature Interest Chart */}
                 <div className="stat-card" style={{ display: 'block' }}>
                     <h3 className="column-title" style={{ marginBottom: '1.5rem' }}>Feature Interest</h3>

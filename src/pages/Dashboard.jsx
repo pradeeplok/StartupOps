@@ -1,8 +1,11 @@
 import React from 'react';
 import CircularProgress from '../components/CircularProgress';
-import { TrendingUp, Users, DollarSign, Activity, Sparkles, Lightbulb, AlertTriangle } from 'lucide-react';
+import { TrendingUp, Users, IndianRupee, Activity, Sparkles, Lightbulb, AlertTriangle } from 'lucide-react';
+
+import { UserContext } from '../App';
 
 const Dashboard = () => {
+    const { userRole } = React.useContext(UserContext);
     // Simulated AI Rules
     const insights = [
         {
@@ -38,7 +41,7 @@ const Dashboard = () => {
                 <p className="page-subheading">Real-time overview of your startup's health and progress.</p>
             </div>
 
-            {/* AI Insights Banner */}
+            {/* Founder's Playbook - Smart Action Cards */}
             <div style={{
                 background: 'linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%)',
                 border: '1px solid #dbeafe',
@@ -48,17 +51,23 @@ const Dashboard = () => {
                 position: 'relative',
                 overflow: 'hidden'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                    <div style={{
-                        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                        color: 'white',
-                        padding: '0.5rem',
-                        borderRadius: '0.5rem',
-                        boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.3)'
-                    }}>
-                        <Sparkles size={20} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div style={{
+                            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                            color: 'white',
+                            padding: '0.5rem',
+                            borderRadius: '0.5rem',
+                            boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.3)'
+                        }}>
+                            <Sparkles size={20} />
+                        </div>
+                        <div>
+                            <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--slate-800)' }}>Founder's Playbook</h3>
+                            <p className="text-xs text-slate-500">AI-Recommended next steps for your startup.</p>
+                        </div>
                     </div>
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--slate-800)' }}>AI Strategic Insights</h3>
+                    <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-100">3 Actions Pending</span>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
@@ -67,18 +76,21 @@ const Dashboard = () => {
                             background: 'white',
                             padding: '1rem',
                             borderRadius: '0.5rem',
-                            border: '1px solid rgba(0,0,0,0.05)',
+                            borderLeft: `4px solid ${insight.bg === 'bg-green-50' ? 'var(--success)' : insight.bg === 'bg-amber-50' ? 'var(--warning)' : 'var(--primary-blue)'}`,
                             boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                 <div className={`p-1.5 rounded ${insight.bg} ${insight.color}`}>
                                     {insight.icon}
                                 </div>
-                                <span style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--slate-700)' }}>{insight.title}</span>
+                                <span style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--slate-800)' }}>{insight.title}</span>
                             </div>
-                            <p style={{ fontSize: '0.875rem', color: 'var(--slate-600)', lineHeight: 1.5 }}>
+                            <p style={{ fontSize: '0.875rem', color: 'var(--slate-600)', lineHeight: 1.5, marginBottom: '0.75rem' }}>
                                 {insight.description}
                             </p>
+                            <button className="text-xs font-bold uppercase tracking-wide text-blue-600 hover:underline">
+                                Take Action →
+                            </button>
                         </div>
                     ))}
                 </div>
@@ -96,55 +108,73 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                <div className="stat-card">
-                    <div className="stat-icon green">
-                        <DollarSign size={24} />
-                    </div>
-                    <div>
-                        <div className="stat-value">$4.2k</div>
-                        <div className="stat-label">MRR</div>
-                    </div>
-                </div>
+                {userRole === 'founder' && (
+                    <>
+                        <div className="stat-card">
+                            <div className="stat-icon green">
+                                <IndianRupee size={24} />
+                            </div>
+                            <div>
+                                <div className="stat-value">₹4.2k</div>
+                                <div className="stat-label">MRR</div>
+                            </div>
+                        </div>
 
-                <div className="stat-card">
-                    <div className="stat-icon purple">
-                        <TrendingUp size={24} />
-                    </div>
-                    <div>
-                        <div className="stat-value">+18%</div>
-                        <div className="stat-label">Growth MoM</div>
-                    </div>
-                </div>
+                        <div className="stat-card">
+                            <div className="stat-icon purple">
+                                <TrendingUp size={24} />
+                            </div>
+                            <div>
+                                <div className="stat-value">+18%</div>
+                                <div className="stat-label">Growth MoM</div>
+                            </div>
+                        </div>
 
-                <div className="stat-card">
-                    <div className="stat-icon orange">
-                        <Activity size={24} />
+                        <div className="stat-card">
+                            <div className="stat-icon orange">
+                                <Activity size={24} />
+                            </div>
+                            <div>
+                                <div className="stat-value">8 Mo</div>
+                                <div className="stat-label">Runway</div>
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {userRole === 'member' && (
+                    <div className="stat-card bg-slate-50 border-dashed">
+                        <div className="stat-icon slate">
+                            <Activity size={24} />
+                        </div>
+                        <div>
+                            <div className="stat-value">3</div>
+                            <div className="stat-label">My Active Tasks</div>
+                        </div>
                     </div>
-                    <div>
-                        <div className="stat-value">8 Mo</div>
-                        <div className="stat-label">Runway</div>
-                    </div>
-                </div>
+                )}
             </div>
 
             <div className="dashboard-sections">
-                {/* Startup Health Score */}
-                <div className="section-card">
-                    <h3 className="column-title" style={{ marginBottom: '1.5rem', width: '100%', textAlign: 'center' }}>Startup Health Score</h3>
-                    <CircularProgress
-                        value={85}
-                        max={100}
-                        size={180}
-                        strokeWidth={15}
-                        color="var(--accent-teal)"
-                        subLabel="Excellent"
-                    />
-                    <p className="text-slate-500 text-center text-sm mt-6" style={{ maxWidth: '300px' }}>
-                        Your startup is performing well across all key metrics. Keep focusing on user retention.
-                    </p>
-                </div>
+                {/* Startup Health Score - Founder Only */}
+                {userRole === 'founder' && (
+                    <div className="section-card">
+                        <h3 className="column-title" style={{ marginBottom: '1.5rem', width: '100%', textAlign: 'center' }}>Startup Health Score</h3>
+                        <CircularProgress
+                            value={85}
+                            max={100}
+                            size={180}
+                            strokeWidth={15}
+                            color="var(--accent-teal)"
+                            subLabel="Excellent"
+                        />
+                        <p className="text-slate-500 text-center text-sm mt-6" style={{ maxWidth: '300px' }}>
+                            Your startup is performing well across all key metrics. Keep focusing on user retention.
+                        </p>
+                    </div>
+                )}
 
-                {/* Validation Progress */}
+                {/* Validation Progress - Visible to All */}
                 <div className="section-card">
                     <h3 className="column-title" style={{ marginBottom: '1.5rem', width: '100%', textAlign: 'center' }}>Validation Progress</h3>
                     <div className="flex gap-4">

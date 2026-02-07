@@ -89,7 +89,7 @@ const PitchDeck = () => {
                                 <span className="font-semibold text-slate-700">{startupData.traction.users}</span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <span className="font-bold text-slate-400">$</span>
+                                <span className="font-bold text-slate-400">₹</span>
                                 <span className="font-semibold text-slate-700">{startupData.traction.mrr}</span>
                             </div>
                             <div className="flex items-center gap-3">

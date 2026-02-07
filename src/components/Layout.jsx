@@ -1,12 +1,17 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Map, BarChart3, Users, Settings, LogOut, Presentation } from 'lucide-react';
+import { LayoutDashboard, Map, BarChart3, Users, Settings, LogOut, Presentation, DollarSign } from 'lucide-react';
+
+import { UserContext } from '../App';
 
 const Layout = () => {
+    const { userRole, toggleRole } = React.useContext(UserContext);
+
     const navItems = [
         { label: 'Command Center', path: '/', icon: LayoutDashboard },
         { label: 'Execution Roadmap', path: '/roadmap', icon: Map },
         { label: 'Recommendation Engine', path: '/recommendation', icon: BarChart3 },
+        { label: 'Finance & Runway', path: '/finance', icon: DollarSign },
         { label: 'Team & Roles', path: '/team', icon: Users },
         { label: 'Pitch Generator', path: '/pitch', icon: Presentation },
     ];
@@ -39,6 +44,9 @@ const Layout = () => {
                 </nav>
 
                 <div className="sidebar-footer">
+                    <button onClick={toggleRole} className="footer-btn" style={{ marginBottom: '0.5rem', background: 'var(--slate-100)', justifyContent: 'center', fontSize: '0.75rem' }}>
+                        Switch to: {userRole === 'founder' ? 'Member' : 'Founder'}
+                    </button>
                     <NavLink to="/settings" className={({ isActive }) => `footer-btn ${isActive ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
                         <Settings size={18} />
                         Settings
