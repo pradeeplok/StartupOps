@@ -46,10 +46,6 @@ const Layout = () => {
                 </nav>
 
                 <div className="sidebar-footer">
-                    <button onClick={toggleTheme} className="footer-btn" style={{ marginBottom: '0.5rem', justifyContent: 'center' }}>
-                        {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-                        {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-                    </button>
                     <button onClick={toggleRole} className="footer-btn" style={{ marginBottom: '0.5rem', background: 'var(--slate-100)', justifyContent: 'center', fontSize: '0.75rem' }}>
                         Switch to: {userRole === 'founder' ? 'Member' : 'Founder'}
                     </button>
@@ -70,6 +66,24 @@ const Layout = () => {
                     <h2 className="page-title">Workspace</h2>
                     <div className="header-actions">
                         <div className="text-sm text-slate-500">Last synced: Just now</div>
+                        <button
+                            onClick={toggleTheme}
+                            style={{
+                                padding: '0.5rem',
+                                borderRadius: '0.5rem',
+                                background: 'var(--slate-100)',
+                                color: 'var(--slate-700)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--slate-200)'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'var(--slate-100)'}
+                        >
+                            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+                            <span className="text-xs font-medium">{theme === 'light' ? 'Dark' : 'Light'}</span>
+                        </button>
                         <div className="user-avatar"></div>
                     </div>
                 </header>
