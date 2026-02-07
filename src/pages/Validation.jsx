@@ -93,18 +93,18 @@ const Validation = () => {
                     </div>
                     <div className="grid-2">
                         {/* Sentiment Gauge */}
-                        <div className="flex flex-col items-center justify-center" style={{ minHeight: '400px' }}>
+                        <div className="flex flex-col items-center justify-center" style={{ minHeight: '280px' }}>
                             <h4 className="text-sm font-semibold text-slate-600 mb-4">Overall Sentiment Score</h4>
-                            <div style={{ position: 'relative', width: '400px', height: '200px' }}>
+                            <div style={{ position: 'relative', width: '280px', height: '140px' }}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
                                             data={[{ value: sentimentMetrics.score }, { value: 100 - sentimentMetrics.score }]}
-                                            cy={200}
+                                            cy={140}
                                             startAngle={180}
                                             endAngle={0}
-                                            innerRadius={120}
-                                            outerRadius={165}
+                                            innerRadius={85}
+                                            outerRadius={115}
                                             dataKey="value"
                                         >
                                             <Cell fill={sentimentMetrics.score > 50 ? "var(--success)" : "var(--warning)"} />
@@ -113,16 +113,16 @@ const Validation = () => {
                                     </PieChart>
                                 </ResponsiveContainer>
                                 <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', textAlign: 'center' }}>
-                                    <span className="text-4xl font-bold" style={{ color: 'var(--slate-800)' }}>{sentimentMetrics.score}%</span>
+                                    <span className="text-3xl font-bold" style={{ color: 'var(--slate-800)' }}>{sentimentMetrics.score}%</span>
                                 </div>
                             </div>
                             <p className="text-xs text-slate-500 mt-2">Positive Feedback Ratio</p>
                         </div>
 
                         {/* Rating Trend */}
-                        <div style={{ minHeight: '400px' }}>
+                        <div style={{ minHeight: '280px' }}>
                             <h4 className="text-sm font-semibold text-slate-600 mb-4">Sentiment Trend (Last 7 Days)</h4>
-                            <ResponsiveContainer width="100%" height={360}>
+                            <ResponsiveContainer width="100%" height={240}>
                                 <AreaChart data={sentimentMetrics.trend}>
                                     <defs>
                                         <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
