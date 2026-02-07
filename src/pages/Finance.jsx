@@ -8,9 +8,14 @@ import {
 import { UserContext } from '../App';
 
 const Finance = () => {
-    const { financialData, updateFinancialData, runwayMonths, userRole } = React.useContext(UserContext);
-    const [editingField, setEditingField] = React.useState(null); // 'bankBalance', 'monthlyBurn', 'mrr'
+    const {
+        financialData, updateFinancialData, runwayMonths, userRole,
+        expenses, addExpense, removeExpense
+    } = React.useContext(UserContext);
+    const [editingField, setEditingField] = React.useState(null);
     const [tempValue, setTempValue] = React.useState('');
+    const [showAddExpense, setShowAddExpense] = React.useState(false);
+    const [newExpense, setNewExpense] = React.useState({ merchant: '', category: '', amount: '' });
 
     // Generate Projection Data (Next 12 Months)
     const generateProjection = () => {
@@ -22,31 +27,18 @@ const Finance = () => {
 
         for (let i = 0; i < 12; i++) {
             const monthLabel = monthNames[(currentMonthIndex + i) % 12];
-            // Simple projection: Cash decreases by net burn
-            // If profitable (Net Burn < 0), Cash increases.
-
             data.push({
                 name: monthLabel,
-                Balance: Math.max(0, currentCash), // Don't show negative cash
+                Balance: Math.max(0, currentCash),
                 Revenue: financialData.mrr,
                 Expenses: financialData.monthlyBurn
             });
-
             currentCash -= netBurn;
         }
         return data;
     };
 
-    const projectionData = React.useMemo(() => generateProjection(), [financialData.bankBalance, financialData.monthlyBurn, financialData.mrr]);
-
-    // Mock Expenses (Static for now)
-    const expenses = [
-        { id: 1, category: 'Hosting', merchant: 'AWS Services', amount: 450, date: 'Oct 24', status: 'posted' },
-        { id: 2, category: 'Payroll', merchant: 'Gusto', amount: 8500, date: 'Oct 22', status: 'posted' },
-        { id: 3, category: 'Software', merchant: 'Slack', amount: 250, date: 'Oct 20', status: 'posted' },
-        { id: 4, category: 'Marketing', merchant: 'Google Ads', amount: 1200, date: 'Oct 18', status: 'pending' },
-        { id: 5, category: 'Software', merchant: 'Notion', amount: 50, date: 'Oct 15', status: 'posted' },
-    ];
+    const projectionData = React.useMemo(() => generateProjection(), [financialData]);
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
@@ -68,10 +60,24 @@ const Finance = () => {
         setEditingField(null);
     };
 
-    // Helper Component for Editable Stat
+    const handleAddExpense = (e) => {
+        e.preventDefault();
+        if (!newExpense.merchant || !newExpense.amount) return;
+
+        addExpense({
+            id: Date.now(),
+            merchant: newExpense.merchant,
+            category: newExpense.category || 'General',
+            amount: Number(newExpense.amount),
+            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            status: 'pending'
+        });
+        setNewExpense({ merchant: '', category: '', amount: '' });
+        setShowAddExpense(false);
+    };
+
     const EditableStat = ({ label, field, value, icon: Icon, colorClass }) => {
         const isEditing = editingField === field;
-
         return (
             <div className={`stat-card ${field === 'runway' && value < 6 ? 'border-red-200 bg-red-50' : ''}`}>
                 <div className={`stat-icon ${colorClass}`}>
@@ -126,42 +132,56 @@ const Finance = () => {
                     <button className="btn btn-secondary">
                         Export Report
                     </button>
-                    <button className="btn btn-primary">
+                    <button onClick={() => setShowAddExpense(true)} className="btn btn-primary">
                         <IndianRupee size={16} /> Add Expense
                     </button>
                 </div>
             </div>
 
+            {/* Add Expense Modal */}
+            {showAddExpense && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50
+                }}>
+                    <div style={{ background: 'white', padding: '2rem', borderRadius: '8px', width: '400px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                        <h3 className="text-lg font-bold mb-4">Add New Expense</h3>
+                        <form onSubmit={handleAddExpense} className="flex flex-col gap-4">
+                            <input
+                                placeholder="Merchant (e.g. AWS)"
+                                value={newExpense.merchant}
+                                onChange={e => setNewExpense({ ...newExpense, merchant: e.target.value })}
+                                className="p-2 border rounded"
+                                autoFocus
+                            />
+                            <input
+                                placeholder="Category (e.g. Infrastructure)"
+                                value={newExpense.category}
+                                onChange={e => setNewExpense({ ...newExpense, category: e.target.value })}
+                                className="p-2 border rounded"
+                            />
+                            <input
+                                type="number"
+                                placeholder="Amount (e.g. 500)"
+                                value={newExpense.amount}
+                                onChange={e => setNewExpense({ ...newExpense, amount: e.target.value })}
+                                className="p-2 border rounded"
+                            />
+                            <div className="flex justify-end gap-2 mt-2">
+                                <button type="button" onClick={() => setShowAddExpense(false)} className="px-4 py-2 text-slate-500">Cancel</button>
+                                <button type="submit" className="btn btn-primary">Add & Update Burn</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {/* Top Metrics Grid */}
             <div className="stats-grid" style={{ marginBottom: '2rem' }}>
-                <EditableStat
-                    label="Total Cash"
-                    field="bankBalance"
-                    value={financialData.bankBalance}
-                    icon={IndianRupee}
-                    colorClass="blue"
-                />
-                <EditableStat
-                    label="Monthly Burn"
-                    field="monthlyBurn"
-                    value={financialData.monthlyBurn}
-                    icon={TrendingDown}
-                    colorClass="orange"
-                />
-                <EditableStat
-                    label="MRR (Revenue)"
-                    field="mrr"
-                    value={financialData.mrr}
-                    icon={TrendingUp}
-                    colorClass="green"
-                />
-                <EditableStat
-                    label="Runway Left"
-                    field="runway"
-                    value={runwayMonths}
-                    icon={PieChart}
-                    colorClass="purple"
-                />
+                <EditableStat label="Total Cash" field="bankBalance" value={financialData.bankBalance} icon={IndianRupee} colorClass="blue" />
+                <EditableStat label="Monthly Burn" field="monthlyBurn" value={financialData.monthlyBurn} icon={TrendingDown} colorClass="orange" />
+                <EditableStat label="MRR (Revenue)" field="mrr" value={financialData.mrr} icon={TrendingUp} colorClass="green" />
+                <EditableStat label="Runway Left" field="runway" value={runwayMonths} icon={PieChart} colorClass="purple" />
             </div>
 
             <div className="grid-2">
@@ -202,7 +222,7 @@ const Finance = () => {
                     <h3 className="column-title" style={{ marginBottom: '1.5rem' }}>Recent Expenses</h3>
                     <div className="flex flex-col gap-0">
                         {expenses.map((expense) => (
-                            <div key={expense.id} style={{
+                            <div key={expense.id} className="group" style={{ // Added group for hover effect
                                 display: 'flex',
                                 alignItems: 'center',
                                 padding: '1rem 0',
@@ -224,11 +244,23 @@ const Finance = () => {
                                     <div style={{ fontWeight: 600, color: 'var(--slate-800)' }}>{expense.merchant}</div>
                                     <div style={{ fontSize: '0.875rem', color: 'var(--slate-500)' }}>{expense.category} • {expense.date}</div>
                                 </div>
-                                <div style={{ fontWeight: 600, color: 'var(--slate-800)' }}>
-                                    - {formatCurrency(expense.amount)}
+                                <div className="flex items-center gap-3">
+                                    <div style={{ fontWeight: 600, color: 'var(--slate-800)' }}>
+                                        - {formatCurrency(expense.amount)}
+                                    </div>
+                                    {userRole === 'founder' && (
+                                        <button
+                                            onClick={() => removeExpense(expense.id)}
+                                            className="text-slate-300 hover:text-red-500 transition-colors"
+                                            title="Remove Expense"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}
+                        {expenses.length === 0 && <div className="text-center py-4 text-slate-400">No expenses recorded.</div>}
                         <button className="btn btn-secondary w-full mt-4">View All Transactions</button>
                     </div>
                 </div>

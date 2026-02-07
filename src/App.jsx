@@ -63,6 +63,38 @@ function App() {
     setFinancialData(prev => ({ ...prev, [key]: Number(value) }));
   };
 
+  // --- Expense Logic ---
+  const [expenses, setExpenses] = React.useState([
+    { id: 1, category: 'Hosting', merchant: 'AWS Services', amount: 450, date: 'Oct 24', status: 'posted' },
+    { id: 2, category: 'Payroll', merchant: 'Gusto', amount: 8500, date: 'Oct 22', status: 'posted' },
+    { id: 3, category: 'Software', merchant: 'Slack', amount: 250, date: 'Oct 20', status: 'posted' },
+    { id: 4, category: 'Marketing', merchant: 'Google Ads', amount: 1200, date: 'Oct 18', status: 'pending' },
+    { id: 5, category: 'Software', merchant: 'Notion', amount: 50, date: 'Oct 15', status: 'posted' },
+  ]);
+
+  const addExpense = (newExpense) => {
+    // 1. Add to list
+    setExpenses(prev => [newExpense, ...prev]);
+    // 2. Increase Burn
+    setFinancialData(prev => ({
+      ...prev,
+      monthlyBurn: prev.monthlyBurn + Number(newExpense.amount)
+    }));
+  };
+
+  const removeExpense = (id) => {
+    const expense = expenses.find(e => e.id === id);
+    if (!expense) return;
+
+    // 1. Remove from list
+    setExpenses(prev => prev.filter(e => e.id !== id));
+    // 2. Decrease Burn
+    setFinancialData(prev => ({
+      ...prev,
+      monthlyBurn: Math.max(0, prev.monthlyBurn - Number(expense.amount))
+    }));
+  };
+
   // Dynamic Runway Calculation: Cash / (Burn - MRR)
   const netBurn = financialData.monthlyBurn - financialData.mrr;
   const runwayMonths = netBurn <= 0 ? 999 : Math.round(financialData.bankBalance / netBurn);
@@ -81,7 +113,10 @@ function App() {
       // Finance State
       financialData,
       updateFinancialData,
-      runwayMonths
+      runwayMonths,
+      expenses,
+      addExpense,
+      removeExpense
     }}>
       <Routes>
         <Route path="/validate/:id" element={<PublicValidation />} />
