@@ -5,34 +5,76 @@ import { TrendingUp, Users, IndianRupee, Activity, Sparkles, Lightbulb, AlertTri
 import { UserContext } from '../App';
 
 const Dashboard = () => {
-    const { userRole } = React.useContext(UserContext);
-    // Simulated AI Rules
-    const insights = [
-        {
-            type: 'growth',
-            icon: <TrendingUp size={18} />,
-            color: 'text-green-600',
-            bg: 'bg-green-50',
-            title: 'Growth Opportunity detected',
-            description: 'User signups spiked 18% this week. Consider launching a referral program to sustain momentum.'
-        },
-        {
-            type: 'validation',
-            icon: <AlertTriangle size={18} />,
-            color: 'text-amber-600',
-            bg: 'bg-amber-50',
-            title: 'Validation Gap',
-            description: 'Problem Fit score is high (60%), but Solution Fit is lagging (35%). Recommend scheduling 5 user demos.'
-        },
-        {
-            type: 'efficiency',
-            icon: <Lightbulb size={18} />,
-            color: 'text-blue-600',
-            bg: 'bg-blue-50',
-            title: 'Runway Optimization',
-            description: 'At current burn rate, runway is 8 months. Prepare Series A pitch deck by end of Q3.'
+    const { userRole, tasks, feedbackData } = React.useContext(UserContext);
+
+    // Calculate Health Score Metrics
+    const validationScore = Math.round(
+        feedbackData.reduce((acc, curr) => acc + curr.value, 0) / (feedbackData.length || 1)
+    );
+
+    // Simple execution metric: Tasks in 'done' vs total
+    const doneTasks = tasks.filter(t => t.status === 'done').length;
+    const totalTasks = tasks.length || 1;
+    const executionScore = Math.round((doneTasks / totalTasks) * 100);
+
+    // Weighted Health Score: 60% Validation, 40% Execution
+    const healthScore = Math.round((validationScore * 0.6) + (executionScore * 0.4));
+
+    // Dynamic AI Insights - Using Inline Styles for Colors
+    const generateInsights = () => {
+        const insightsList = [];
+
+        // Pivot Warning Rule
+        if (validationScore < 50) {
+            insightsList.push({
+                type: 'warning',
+                icon: <AlertTriangle size={18} />,
+                color: '#dc2626', // red-600
+                bg: '#fef2f2',   // red-50
+                borderColor: '#ef4444', // red-500
+                title: 'Pivot Recommended',
+                description: `Validation Score is low (${validationScore}%). Re-evaluate core value proposition.`
+            });
         }
-    ];
+        // Growth Signal Rule
+        else if (validationScore > 75 && executionScore > 60) {
+            insightsList.push({
+                type: 'growth',
+                icon: <TrendingUp size={18} />,
+                color: '#16a34a', // green-600
+                bg: '#f0fdf4',   // green-50
+                borderColor: '#22c55e', // green-500
+                title: 'Ready for Scale',
+                description: 'High validation and solid execution. Consider doubling marketing spend.'
+            });
+        }
+
+        // Standard Advice if no alerts
+        if (insightsList.length === 0) {
+            insightsList.push({
+                type: 'efficiency',
+                icon: <Lightbulb size={18} />,
+                color: '#2563eb', // blue-600
+                bg: '#eff6ff',   // blue-50
+                borderColor: '#3b82f6', // blue-500
+                title: 'Optimize Runway',
+                description: 'At current burn rate, runway is 8 months. Focus on closing deals this quarter.'
+            });
+        }
+
+        return insightsList;
+    };
+
+    const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+
+    // Simulate AI Analysis when scores change
+    React.useEffect(() => {
+        setIsAnalyzing(true);
+        const timer = setTimeout(() => setIsAnalyzing(false), 1500); // 1.5s analysis delay
+        return () => clearTimeout(timer);
+    }, [validationScore, executionScore, feedbackData.length]);
+
+    const insights = generateInsights();
 
     return (
         <div>
@@ -49,7 +91,8 @@ const Dashboard = () => {
                 padding: '1.5rem',
                 marginBottom: '2rem',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                minHeight: '200px'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -60,41 +103,69 @@ const Dashboard = () => {
                             borderRadius: '0.5rem',
                             boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.3)'
                         }}>
-                            <Sparkles size={20} />
+                            <Sparkles size={20} className={isAnalyzing ? "animate-spin" : ""} />
                         </div>
                         <div>
                             <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--slate-800)' }}>Founder's Playbook</h3>
-                            <p className="text-xs text-slate-500">AI-Recommended next steps for your startup.</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <p className="text-xs text-slate-500">AI-Recommended next steps based on your data.</p>
+                                {isAnalyzing && (
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--primary-blue)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--primary-blue)', display: 'inline-block' }} className="animate-pulse"></span>
+                                        Analyzing...
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     </div>
-                    <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-100">3 Actions Pending</span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
-                    {insights.map((insight, index) => (
-                        <div key={index} style={{
-                            background: 'white',
-                            padding: '1rem',
-                            borderRadius: '0.5rem',
-                            borderLeft: `4px solid ${insight.bg === 'bg-green-50' ? 'var(--success)' : insight.bg === 'bg-amber-50' ? 'var(--warning)' : 'var(--primary-blue)'}`,
-                            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                <div className={`p-1.5 rounded ${insight.bg} ${insight.color}`}>
-                                    {insight.icon}
+                {isAnalyzing ? (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100px', width: '100%', color: 'var(--slate-400)', gap: '0.5rem' }}>
+                        <Activity className="animate-pulse" size={24} />
+                        <span style={{ fontStyle: 'italic', fontSize: '0.875rem' }}>Processing real-time metrics...</span>
+                    </div>
+                ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', animation: 'fadeIn 0.5s ease-in' }}>
+                        {insights.map((insight, index) => (
+                            <div key={index} style={{
+                                background: 'white',
+                                padding: '1rem',
+                                borderRadius: '0.5rem',
+                                borderLeft: `4px solid ${insight.borderColor}`,
+                                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                    <div style={{
+                                        padding: '0.375rem',
+                                        borderRadius: '0.25rem',
+                                        backgroundColor: insight.bg,
+                                        color: insight.color,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    }}>
+                                        {insight.icon}
+                                    </div>
+                                    <span style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--slate-800)' }}>{insight.title}</span>
                                 </div>
-                                <span style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--slate-800)' }}>{insight.title}</span>
+                                <p style={{ fontSize: '0.875rem', color: 'var(--slate-600)', lineHeight: 1.5, marginBottom: '0.75rem' }}>
+                                    {insight.description}
+                                </p>
+                                <button className="text-xs font-bold uppercase tracking-wide text-blue-600 hover:underline">
+                                    Take Action →
+                                </button>
                             </div>
-                            <p style={{ fontSize: '0.875rem', color: 'var(--slate-600)', lineHeight: 1.5, marginBottom: '0.75rem' }}>
-                                {insight.description}
-                            </p>
-                            <button className="text-xs font-bold uppercase tracking-wide text-blue-600 hover:underline">
-                                Take Action →
-                            </button>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
+
+            <style>{`
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+                .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+                @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+                .animate-spin { animation: spin 1s linear infinite; }
+                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+            `}</style>
 
             <div className="stats-grid">
                 {/* Quick Stats Cards */}
@@ -161,15 +232,15 @@ const Dashboard = () => {
                     <div className="section-card">
                         <h3 className="column-title" style={{ marginBottom: '1.5rem', width: '100%', textAlign: 'center' }}>Startup Health Score</h3>
                         <CircularProgress
-                            value={85}
+                            value={healthScore}
                             max={100}
                             size={180}
                             strokeWidth={15}
-                            color="var(--accent-teal)"
-                            subLabel="Excellent"
+                            color={healthScore > 75 ? "var(--accent-teal)" : healthScore > 50 ? "var(--primary-blue)" : "var(--danger)"}
+                            subLabel={healthScore > 75 ? "Excellent" : healthScore > 50 ? "Good" : "At Risk"}
                         />
-                        <p className="text-slate-500 text-center text-sm mt-6" style={{ maxWidth: '300px' }}>
-                            Your startup is performing well across all key metrics. Keep focusing on user retention.
+                        <p style={{ color: 'var(--slate-500)', textAlign: 'center', fontSize: '0.875rem', marginTop: '1.5rem', maxWidth: '300px', margin: '1.5rem auto 0' }}>
+                            {healthScore > 60 ? "Your startup is performing well." : "Focus on improving validation and execution speed."}
                         </p>
                     </div>
                 )}
@@ -177,9 +248,9 @@ const Dashboard = () => {
                 {/* Validation Progress - Visible to All */}
                 <div className="section-card">
                     <h3 className="column-title" style={{ marginBottom: '1.5rem', width: '100%', textAlign: 'center' }}>Validation Progress</h3>
-                    <div className="flex gap-4">
+                    <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                         <CircularProgress
-                            value={60}
+                            value={validationScore}
                             max={100}
                             size={140}
                             strokeWidth={12}
@@ -187,12 +258,12 @@ const Dashboard = () => {
                             label="Problem Fit"
                         />
                         <CircularProgress
-                            value={35}
+                            value={executionScore}
                             max={100}
                             size={140}
                             strokeWidth={12}
                             color="var(--accent-purple)"
-                            label="Solution Fit"
+                            label="Execution Fit"
                         />
                     </div>
                 </div>
@@ -223,9 +294,9 @@ const Dashboard = () => {
                     <h3 className="column-title" style={{ marginBottom: '1rem' }}>Recent Activity & Milestones</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {[
-                            { title: 'MVP Milestone Reached', type: 'milestone', date: '2 days ago', color: 'text-green-600', bg: 'bg-green-50' },
-                            { title: 'New Feedback Logged: "Love the dashboard"', type: 'feedback', date: '4 hours ago', color: 'text-blue-600', bg: 'bg-blue-50' },
-                            { title: 'Database Schema Finalized', type: 'task', date: '1 day ago', color: 'text-slate-600', bg: 'bg-slate-100' }
+                            { title: 'MVP Milestone Reached', type: 'milestone', date: '2 days ago', color: '#16a34a', bg: '#f0fdf4' },
+                            { title: 'New Feedback Logged: "Love the dashboard"', type: 'feedback', date: '4 hours ago', color: '#2563eb', bg: '#eff6ff' },
+                            { title: 'Database Schema Finalized', type: 'task', date: '1 day ago', color: '#475569', bg: '#f1f5f9' }
                         ].map((item, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)' }}>
                                 <div style={{ width: '0.5rem', height: '0.5rem', borderRadius: '50%', backgroundColor: 'var(--slate-400)' }}></div>
@@ -233,7 +304,15 @@ const Dashboard = () => {
                                     <div style={{ fontWeight: 500, color: 'var(--slate-800)' }}>{item.title}</div>
                                     <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>{item.date}</div>
                                 </div>
-                                <div className={`px-2 py-1 rounded text-xs font-medium ${item.color} ${item.bg}`} style={{ textTransform: 'uppercase' }}>
+                                <div style={{
+                                    padding: '0.25rem 0.5rem',
+                                    borderRadius: '0.25rem',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 500,
+                                    textTransform: 'uppercase',
+                                    color: item.color,
+                                    backgroundColor: item.bg
+                                }}>
                                     {item.type}
                                 </div>
                             </div>

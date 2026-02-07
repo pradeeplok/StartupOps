@@ -7,14 +7,16 @@ import { UserContext } from '../App';
 const Layout = () => {
     const { userRole, toggleRole } = React.useContext(UserContext);
 
-    const navItems = [
+    const allNavItems = [
         { label: 'Command Center', path: '/', icon: LayoutDashboard },
         { label: 'Execution Roadmap', path: '/roadmap', icon: Map },
         { label: 'Recommendation Engine', path: '/recommendation', icon: BarChart3 },
-        { label: 'Finance & Runway', path: '/finance', icon: DollarSign },
+        { label: 'Finance & Runway', path: '/finance', icon: DollarSign, roles: ['founder'] },
         { label: 'Team & Roles', path: '/team', icon: Users },
-        { label: 'Pitch Generator', path: '/pitch', icon: Presentation },
+        { label: 'Pitch Generator', path: '/pitch', icon: Presentation, roles: ['founder'] },
     ];
+
+    const navItems = allNavItems.filter(item => !item.roles || item.roles.includes(userRole));
 
     return (
         <div className="app-container">

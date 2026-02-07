@@ -6,8 +6,10 @@ import KanbanColumn from '../components/KanbanColumn';
 import KanbanCard from '../components/KanbanCard';
 import { Plus, X } from 'lucide-react';
 
+import { UserContext } from '../App';
+
 const Roadmap = () => {
-    const [tasks, setTasks] = useState(initialTasks);
+    const { tasks, setTasks } = React.useContext(UserContext);
     const [activeId, setActiveId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newTask, setNewTask] = useState({ content: '', milestone: 'MVP', assignee: 'AF' });
@@ -101,10 +103,12 @@ const Roadmap = () => {
                         </span>
                     </div>
                 </div>
-                <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
-                    <Plus size={18} />
-                    New Task
-                </button>
+                {React.useContext(UserContext).userRole === 'founder' && (
+                    <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+                        <Plus size={18} />
+                        New Task
+                    </button>
+                )}
             </div>
 
             <DndContext
@@ -115,13 +119,22 @@ const Roadmap = () => {
                 onDragOver={handleDragOver}
             >
                 <div className="kanban-board">
-                    {initialColumns.map((col) => (
-                        <KanbanColumn
-                            key={col.id}
-                            column={col}
-                            tasks={tasks.filter(t => t.status === col.id)}
-                        />
-                    ))}
+                    {initialColumns.map((col) => {
+                        const colTasks = tasks.filter(t => t.status === col.id);
+                        return (
+                            <div key={col.id} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                <KanbanColumn
+                                    column={col}
+                                    tasks={colTasks}
+                                />
+                                {colTasks.length === 0 && (
+                                    <div style={{ padding: '1rem', border: '2px dashed var(--slate-200)', borderRadius: '0.5rem', marginTop: '0.5rem', textAlign: 'center', color: 'var(--slate-400)' }}>
+                                        <p style={{ fontSize: '0.875rem' }}>No tasks yet</p>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
                 <DragOverlay>
                     {activeId ? <KanbanCard task={tasks.find(t => t.id === activeId)} /> : null}

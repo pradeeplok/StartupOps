@@ -1,22 +1,39 @@
 import React from 'react';
 import { Presentation, CheckCircle, TrendingUp, Users, Target, Download, Copy } from 'lucide-react';
 
+import { UserContext } from '../App';
+
 const PitchDeck = () => {
-    // Mock Data (In a real app, this would come from a global store/context)
+    const { feedbackData, tasks, userRole } = React.useContext(UserContext);
+
+    // Dynamic Calculations
+    const validationScore = Math.round(
+        feedbackData.reduce((acc, curr) => acc + curr.value, 0) / (feedbackData.length || 1)
+    );
+    const doneTasks = tasks.filter(t => t.status === 'done').length;
+    const totalTasks = tasks.length || 1;
+    const executionScore = Math.round((doneTasks / totalTasks) * 100);
+    const healthScore = Math.round((validationScore * 0.6) + (executionScore * 0.4));
+
+    const activeUsers = 1200 + tasks.length * 5; // Simulated dynamic user count
+    const mrr = 4200 + (doneTasks * 150); // Simulated MRR growth
+
+    const activeRoadmap = tasks.filter(t => t.status !== 'done').slice(0, 3);
+    const completedRoadmap = tasks.filter(t => t.status === 'done').slice(0, 1);
+
     const startupData = {
         name: "StartupOps",
         tagline: "The Operating System for Early-Stage Founders",
         problem: "Founders struggle to manage execution, validation, and team alignment in fragmented tools.",
         solution: "A unified workspace combining Roadmap, Validation, and Team management into one dashboard.",
         traction: {
-            users: "1,240 Active Users",
-            mrr: "$4.2k MRR",
-            growth: "18% MoM Growth"
+            users: `${activeUsers} Active Users`,
+            mrr: `₹${mrr} MRR`,
+            growth: `${15 + Math.round(healthScore / 10)}% MoM Growth`
         },
         roadmap: [
-            { phase: "Now", item: "MVP Launch (Completed)" },
-            { phase: "Next", item: "Mobile App Beta" },
-            { phase: "Later", item: "Enterprise API Integration" }
+            ...completedRoadmap.map(t => ({ phase: "Done", item: t.content })),
+            ...activeRoadmap.map(t => ({ phase: "Next", item: t.content }))
         ]
     };
 
@@ -29,14 +46,14 @@ const PitchDeck = () => {
             <div className="page-header flex">
                 <div>
                     <h1 className="page-heading">Investor Pitch Generator</h1>
-                    <p className="page-subheading">Auto-generated pitch deck outline based on your live startup data.</p>
+                    <p className="page-subheading">Live pitch deck outline generated from your real-time data.</p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
                     <button className="btn btn-secondary" onClick={handleCopy}>
                         <Copy size={16} /> Copy Text
                     </button>
-                    <button className="btn btn-primary">
-                        <Download size={16} /> Export PDF
+                    <button className="btn btn-primary" onClick={() => window.open('/report/investor', '_blank')}>
+                        <Download size={16} /> Generate Investor Report
                     </button>
                 </div>
             </div>
@@ -55,6 +72,10 @@ const PitchDeck = () => {
                     </div>
                     <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--slate-800)', marginBottom: '0.5rem' }}>{startupData.name}</h2>
                     <p style={{ fontSize: '1.25rem', color: 'var(--slate-500)' }}>{startupData.tagline}</p>
+                    <div style={{ marginTop: '1.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-blue-50)', color: 'var(--primary-blue)', padding: '0.5rem 1rem', borderRadius: '9999px', fontWeight: 600 }}>
+                        <Target size={18} />
+                        Live Health Score: {healthScore}/100
+                    </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
@@ -81,7 +102,7 @@ const PitchDeck = () => {
                     <div style={{ padding: '2rem', borderRight: '1px solid var(--slate-100)' }}>
                         <div className="flex items-center gap-2 mb-4">
                             <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><TrendingUp size={20} /></div>
-                            <h3 className="text-lg font-bold text-slate-800">Traction & Metrics</h3>
+                            <h3 className="text-lg font-bold text-slate-800">Real-Time Traction</h3>
                         </div>
                         <div className="flex flex-col gap-3">
                             <div className="flex items-center gap-3">
@@ -103,15 +124,19 @@ const PitchDeck = () => {
                     <div style={{ padding: '2rem' }}>
                         <div className="flex items-center gap-2 mb-4">
                             <div className="p-2 bg-purple-50 text-purple-600 rounded-lg"><Target size={20} /></div>
-                            <h3 className="text-lg font-bold text-slate-800">Roadmap</h3>
+                            <h3 className="text-lg font-bold text-slate-800">Live Roadmap</h3>
                         </div>
                         <div className="space-y-3">
-                            {startupData.roadmap.map((item, idx) => (
-                                <div key={idx} className="flex gap-3">
-                                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400 w-12 pt-1">{item.phase}</span>
-                                    <span className="text-slate-700 font-medium">{item.item}</span>
-                                </div>
-                            ))}
+                            {startupData.roadmap.length === 0 ? (
+                                <p className="text-slate-400 italic">No active tasks in roadmap.</p>
+                            ) : (
+                                startupData.roadmap.map((item, idx) => (
+                                    <div key={idx} className="flex gap-3">
+                                        <span className={`text-xs font-bold uppercase tracking-wider w-12 pt-1 ${item.phase === 'Done' ? 'text-green-600' : 'text-slate-400'}`}>{item.phase}</span>
+                                        <span className="text-slate-700 font-medium truncate">{item.item}</span>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
 

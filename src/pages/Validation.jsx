@@ -2,19 +2,10 @@ import React, { useState } from 'react';
 import { ThumbsUp, ThumbsDown, MessageSquare, ArrowRight, Target, Plus, X } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, CartesianGrid } from 'recharts';
 
-const Validation = () => {
-    const [feedbackData, setFeedbackData] = useState([
-        { label: 'Feature A', value: 80, sentiment: 'positive' },
-        { label: 'Feature B', value: 45, sentiment: 'neutral' },
-        { label: 'Feature C', value: 20, sentiment: 'negative' },
-        { label: 'Pricing', value: 65, sentiment: 'positive' },
-    ]);
+import { UserContext } from '../App';
 
-    const [recentFeedback, setRecentFeedback] = useState([
-        { id: 1, user: 'Sarah J.', comment: "Love the new dashboard layout!", sentiment: 'positive', date: '2h ago' },
-        { id: 2, user: 'Mike T.', comment: "Can't find the export button.", sentiment: 'negative', date: '5h ago' },
-        { id: 3, user: 'Alex R.', comment: "It's okay, but needs dark mode.", sentiment: 'neutral', date: '1d ago' },
-    ]);
+const Validation = () => {
+    const { feedbackData, recentFeedback, setRecentFeedback, addFeedbackToRoadmap } = React.useContext(UserContext);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newFeedback, setNewFeedback] = useState({ user: '', comment: '', sentiment: 'positive' });
@@ -110,6 +101,8 @@ const Validation = () => {
                     </div>
                 </div>
 
+                {/* Rating Distribution Removed */}
+
                 {/* Feature Interest Chart */}
                 <div className="stat-card" style={{ display: 'block' }}>
                     <h3 className="column-title" style={{ marginBottom: '1.5rem' }}>Feature Interest</h3>
@@ -149,24 +142,40 @@ const Validation = () => {
                         </button>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {recentFeedback.map((fb) => (
-                            <div key={fb.id} style={{ padding: '1rem', border: '1px solid var(--slate-100)', borderRadius: '0.5rem', background: 'var(--slate-50)' }}>
-                                <div className="flex justify-between items-start" style={{ marginBottom: '0.5rem' }}>
-                                    <div className="flex items-center gap-2">
-                                        <span style={{ fontWeight: 700, color: 'var(--slate-700)', fontSize: '0.875rem' }}>{fb.user}</span>
-                                        <span style={{ fontSize: '0.75rem', color: 'var(--slate-400)' }}>• {fb.date}</span>
-                                    </div>
-                                    {fb.sentiment === 'positive' && <ThumbsUp size={14} style={{ color: 'var(--success)' }} />}
-                                    {fb.sentiment === 'negative' && <ThumbsDown size={14} style={{ color: 'var(--danger)' }} />}
-                                    {fb.sentiment === 'neutral' && <MessageSquare size={14} style={{ color: 'var(--warning)' }} />}
-                                </div>
-                                <p style={{ color: 'var(--slate-600)', fontSize: '0.875rem' }}>{fb.comment}</p>
-                                <div style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: 'var(--primary-blue)', cursor: 'pointer' }}>
-                                    <span>Link to Task</span>
-                                    <ArrowRight size={10} />
-                                </div>
+                        {recentFeedback.length === 0 ? (
+                            <div style={{ padding: '2rem', textAlign: 'center', border: '2px dashed var(--slate-200)', borderRadius: '0.5rem', color: 'var(--slate-500)' }}>
+                                <MessageSquare size={32} style={{ margin: '0 auto 1rem auto', opacity: 0.5 }} />
+                                <p style={{ fontWeight: 600 }}>No feedback yet</p>
+                                <p style={{ fontSize: '0.875rem' }}>Share your validation link to start gathering insights!</p>
                             </div>
-                        ))}
+                        ) : (
+                            recentFeedback.map((fb) => (
+                                <div key={fb.id} style={{ padding: '1rem', border: '1px solid var(--slate-100)', borderRadius: '0.5rem', background: 'var(--slate-50)' }}>
+                                    <div className="flex justify-between items-start" style={{ marginBottom: '0.5rem' }}>
+                                        <div className="flex items-center gap-2">
+                                            <span style={{ fontWeight: 700, color: 'var(--slate-700)', fontSize: '0.875rem' }}>{fb.user}</span>
+                                            <span style={{ fontSize: '0.75rem', color: 'var(--slate-400)' }}>• {fb.date}</span>
+                                        </div>
+                                        {fb.sentiment === 'positive' && <ThumbsUp size={14} style={{ color: 'var(--success)' }} />}
+                                        {fb.sentiment === 'negative' && <ThumbsDown size={14} style={{ color: 'var(--danger)' }} />}
+                                        {fb.sentiment === 'neutral' && <MessageSquare size={14} style={{ color: 'var(--warning)' }} />}
+                                    </div>
+                                    <p style={{ color: 'var(--slate-600)', fontSize: '0.875rem' }}>{fb.comment}</p>
+                                    <div style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                                        <div className="flex items-center gap-2 text-blue-600 cursor-pointer">
+                                            <span>Link to Task</span>
+                                            <ArrowRight size={10} />
+                                        </div>
+                                        <button
+                                            className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-1 px-2 rounded border border-slate-200 flex items-center gap-1"
+                                            onClick={() => addFeedbackToRoadmap(fb)}
+                                        >
+                                            <Plus size={10} /> Add to Roadmap
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>

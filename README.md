@@ -29,39 +29,43 @@
 
 ```mermaid
 graph TD
-    Client[Client Browser]
+    user[User (Founder/Member)] -->|Access| Client[Client Browser (React/Vite)]
     
-    subgraph "Frontend Application"
-        Router[React Router]
-        Auth[User/Role Context]
+    subgraph "Frontend Layer"
+        Client --> Router[React Router]
+        Router --> Auth[Firebase Auth Wrapper]
         
-        subgraph "Modules"
+        subgraph "Core Modules"
             Dash[Command Center]
             Road[Execution Roadmap]
             Valid[Validation Engine]
             Fin[Financial Module]
-            Pitch[Pitch Generator]
         end
         
-        Router --> Auth
         Auth --> Dash
         Auth --> Road
         Auth --> Valid
         Auth --> Fin
-        Auth --> Pitch
     end
     
-    subgraph "Data Layer (Mocked/Future)"
-        Store[Local State / Firestore]
-        AI[AI Logic Integration]
+    subgraph "Backend Layer (Firebase)"
+        Auth -.->|Authentication| FB_Auth[Firebase Auth]
+        Dash <-->|Real-time Sync| Firestore[Firestore DB]
+        Road <-->|Kanban State| Firestore
+        Valid <-->|Feedback Data| Firestore
     end
     
-    Dash <--> Store
-    Road <--> Store
-    Valid <--> Store
-    Valid <--> AI
-    Pitch <--> Store
+    subgraph "External/AI"
+        Valid -.->|Analysis| AI[AI Sentiment Engine]
+    end
 ```
+
+## 🔄 The Innovation Loop (Feedback-to-Task)
+StartupOps features a closed-loop system for continuous improvement:
+1.  **Capture**: User submits feedback via the **Public Validation Page** (`/validate/:id`).
+2.  **Analyze**: The **Validation Engine** visualizes sentiment and trends.
+3.  **Act**: Founders click **"Add to Roadmap"** on any feedback item.
+4.  **Execute**: The item instantly becomes a **Task** in the Kanban backlog for the team to implement.
 
 ## 📦 Installation & Setup
 
