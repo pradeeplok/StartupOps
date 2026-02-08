@@ -125,43 +125,26 @@ const Dashboard = () => {
     const insights = generateInsights();
 
     return (
-        <div>
+        <div className="dashboard-container">
             <div className="page-header">
                 <h1 className="page-heading">Founder's Command Center</h1>
                 <p className="page-subheading">Real-time overview of your startup's health and progress.</p>
             </div>
 
             {/* Founder's Playbook - Smart Action Cards */}
-            <div style={{
-                background: theme === 'dark'
-                    ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%)'
-                    : 'linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%)',
-                border: theme === 'dark' ? '1px solid var(--border-light)' : '1px solid #dbeafe',
-                borderRadius: '0.75rem',
-                padding: '1.5rem',
-                marginBottom: '2rem',
-                position: 'relative',
-                overflow: 'hidden',
-                minHeight: '200px'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div style={{
-                            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                            color: 'white',
-                            padding: '0.5rem',
-                            borderRadius: '0.5rem',
-                            boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.3)'
-                        }}>
+            <div className={`founders-playbook ${theme === 'dark' ? 'dark' : ''}`}>
+                <div className="playbook-header">
+                    <div className="playbook-title-group">
+                        <div className="playbook-icon-wrapper">
                             <Sparkles size={20} className={isAnalyzing ? "animate-spin" : ""} />
                         </div>
                         <div>
-                            <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--slate-800)' }}>Founder's Playbook</h3>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <p className="text-xs text-slate-500">AI-Recommended next steps based on your data.</p>
+                            <h3 className="playbook-title">Founder's Playbook</h3>
+                            <div className="flex items-center gap-2">
+                                <p className="playbook-subtitle">AI-Recommended next steps based on your data.</p>
                                 {isAnalyzing && (
-                                    <span style={{ fontSize: '0.75rem', color: 'var(--primary-blue)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--primary-blue)', display: 'inline-block' }} className="animate-pulse"></span>
+                                    <span className="analyzing-indicator">
+                                        <span className="analyzing-dot animate-pulse"></span>
                                         Analyzing...
                                     </span>
                                 )}
@@ -171,38 +154,26 @@ const Dashboard = () => {
                 </div>
 
                 {isAnalyzing ? (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100px', width: '100%', color: 'var(--slate-400)', gap: '0.5rem' }}>
+                    <div className="flex items-center justify-center h-24 w-full text-slate-400 gap-2">
                         <Activity className="animate-pulse" size={24} />
-                        <span style={{ fontStyle: 'italic', fontSize: '0.875rem' }}>Processing real-time metrics...</span>
+                        <span className="italic text-sm">Processing real-time metrics...</span>
                     </div>
                 ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', animation: 'fadeIn 0.5s ease-in' }}>
+                    <div className="insights-grid">
                         {insights.map((insight, index) => (
-                            <div key={index} style={{
-                                background: 'var(--bg-card)',
-                                padding: '1rem',
-                                borderRadius: '0.5rem',
-                                borderLeft: `4px solid ${insight.borderColor}`,
-                                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
-                            }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                    <div style={{
-                                        padding: '0.375rem',
-                                        borderRadius: '0.25rem',
-                                        backgroundColor: insight.bg,
-                                        color: insight.color,
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                    }}>
+                            <div key={index} className="insight-card" style={{ borderLeftColor: insight.borderColor }}>
+                                <div className="insight-header">
+                                    <div className="insight-icon" style={{ backgroundColor: insight.bg, color: insight.color }}>
                                         {insight.icon}
                                     </div>
-                                    <span style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--slate-800)' }}>{insight.title}</span>
+                                    <span className="insight-title">{insight.title}</span>
                                 </div>
-                                <p style={{ fontSize: '0.875rem', color: 'var(--slate-600)', lineHeight: 1.5, marginBottom: '0.75rem' }}>
+                                <p className="insight-description">
                                     {insight.description}
                                 </p>
                                 <button
                                     onClick={() => navigate('/finance')}
-                                    className="text-xs font-bold uppercase tracking-wide text-blue-600 hover:underline"
+                                    className="insight-action"
                                 >
                                     Take Action →
                                 </button>
@@ -211,14 +182,6 @@ const Dashboard = () => {
                     </div>
                 )}
             </div>
-
-            <style>{`
-                @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-                .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-                @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-                .animate-spin { animation: spin 1s linear infinite; }
-                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-            `}</style>
 
             <div className="stats-grid">
                 {userRole === 'founder' && (
@@ -274,7 +237,7 @@ const Dashboard = () => {
                 {/* Startup Health Score - Founder Only */}
                 {userRole === 'founder' && (
                     <div className="section-card">
-                        <h3 className="column-title" style={{ marginBottom: '1.5rem', width: '100%', textAlign: 'center' }}>Startup Health Score</h3>
+                        <h3 className="column-title text-center w-full mb-6">Startup Health Score</h3>
                         <CircularProgress
                             value={healthScore}
                             max={100}
@@ -283,7 +246,7 @@ const Dashboard = () => {
                             color={healthScore > 75 ? "var(--accent-teal)" : healthScore > 50 ? "var(--primary-blue)" : "var(--danger)"}
                             subLabel={healthScore > 75 ? "Excellent" : healthScore > 50 ? "Good" : "At Risk"}
                         />
-                        <p style={{ color: 'var(--slate-500)', textAlign: 'center', fontSize: '0.875rem', marginTop: '1.5rem', maxWidth: '300px', margin: '1.5rem auto 0' }}>
+                        <p className="text-slate-500 text-center text-sm mt-6 max-w-xs mx-auto">
                             {healthScore > 60 ? "Your startup is performing well." : "Focus on improving validation and execution speed."}
                         </p>
                     </div>
@@ -291,8 +254,8 @@ const Dashboard = () => {
 
                 {/* Validation Progress - Visible to All */}
                 <div className="section-card">
-                    <h3 className="column-title" style={{ marginBottom: '1.5rem', width: '100%', textAlign: 'center' }}>Validation Progress</h3>
-                    <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <h3 className="column-title text-center w-full mb-6">Validation Progress</h3>
+                    <div className="flex gap-8 justify-center flex-wrap">
                         <CircularProgress
                             value={validationScore}
                             max={100}
@@ -313,15 +276,15 @@ const Dashboard = () => {
                 </div>
 
                 {/* Task Status Distribution (Pipeline Cards) */}
-                <div className="section-card" style={{ gridColumn: 'span 2', background: 'transparent', boxShadow: 'none', padding: 0, border: 'none' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                        <h3 className="column-title" style={{ marginBottom: 0 }}>Live Execution Pipeline</h3>
+                <div className="section-card col-span-2 p-0 border-none shadow-none bg-transparent">
+                    <div className="pipeline-header">
+                        <h3 className="column-title mb-0">Live Execution Pipeline</h3>
                         <span className="text-xs font-medium text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm">
                             Real-time snapshot
                         </span>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
+                    <div className="pipeline-grid">
                         {[
                             { id: 'backlog', label: 'Backlog', icon: <CircleDashed size={20} />, color: 'var(--slate-500)', bg: 'var(--slate-200)' },
                             { id: 'todo', label: 'To Do', icon: <ListTodo size={20} />, color: 'var(--text-orange-600)', bg: 'var(--bg-orange-50)' },
@@ -332,85 +295,56 @@ const Dashboard = () => {
                             const percentage = Math.round((count / (tasks.length || 1)) * 100) || 0;
 
                             return (
-                                <div key={status.id} style={{
-                                    background: 'var(--bg-card)',
-                                    borderRadius: '0.75rem',
-                                    padding: '1.25rem',
-                                    border: '1px solid var(--border-light)',
-                                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '1rem',
-                                    transition: 'transform 0.2s, box-shadow 0.2s',
-                                    cursor: 'default'
-                                }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'; }}
-                                >
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: status.color }}>
-                                        <div style={{ padding: '0.5rem', borderRadius: '0.5rem', backgroundColor: status.bg }}>
+                                <div key={status.id} className="pipeline-card">
+                                    <div className="pipeline-card-header" style={{ color: status.color }}>
+                                        <div className="pipeline-icon" style={{ backgroundColor: status.bg }}>
                                             {status.icon}
                                         </div>
-                                        <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{status.label}</span>
+                                        <span className="pipeline-label">{status.label}</span>
                                     </div>
 
                                     <div>
-                                        <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--slate-800)', lineHeight: 1 }}>{count}</div>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--slate-400)', marginTop: '0.25rem' }}>Tasks</div>
+                                        <div className="pipeline-count">{count}</div>
+                                        <div className="text-xs text-slate-400 mt-1">Tasks</div>
                                     </div>
 
-                                    <div style={{
-                                        width: '100%',
-                                        height: '6px',
-                                        backgroundColor: 'var(--slate-100)',
-                                        borderRadius: '3px',
-                                        overflow: 'hidden',
-                                        marginTop: 'auto'
-                                    }}>
-                                        <div style={{
-                                            width: `${percentage}%`,
-                                            height: '100%',
-                                            backgroundColor: status.color,
-                                            borderRadius: '3px',
-                                            transition: 'width 0.5s ease-in-out'
-                                        }}></div>
+                                    <div className="pipeline-progress-bg">
+                                        <div
+                                            className="pipeline-progress-bar"
+                                            style={{ width: `${percentage}%`, backgroundColor: status.color }}
+                                        ></div>
                                     </div>
                                 </div>
                             );
                         })}
                     </div>
-                    <style>{`
-                        .animate-spin-slow { animation: spin 3s linear infinite; }
-                    `}</style>
                 </div>
 
                 {/* Recent Milestones & Activity (Real-Time) */}
-                <div className="section-card" style={{ gridColumn: 'span 2' }}>
-                    <h3 className="column-title" style={{ marginBottom: '1rem' }}>Recent Activity & Milestones</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div className="section-card col-span-2">
+                    <h3 className="column-title mb-4">Recent Activity & Milestones</h3>
+                    <div className="activity-list">
                         {recentActivities && recentActivities.length > 0 ? (
                             recentActivities.map((activity) => (
-                                <div key={activity.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)' }}>
-                                    <div style={{ width: '0.5rem', height: '0.5rem', borderRadius: '50%', backgroundColor: activity.type === 'milestone' ? 'var(--accent-teal)' : 'var(--primary-blue)' }}></div>
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ fontWeight: 500, color: 'var(--slate-800)' }}>{activity.text}</div>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--slate-500)' }}>{activity.timestamp}</div>
+                                <div key={activity.id} className="activity-item">
+                                    <div className="activity-dot" style={{ backgroundColor: activity.type === 'milestone' ? 'var(--accent-teal)' : 'var(--primary-blue)' }}></div>
+                                    <div className="activity-content">
+                                        <div className="activity-text">{activity.text}</div>
+                                        <div className="activity-time">{activity.timestamp}</div>
                                     </div>
-                                    <div style={{
-                                        padding: '0.25rem 0.5rem',
-                                        borderRadius: '0.25rem',
-                                        fontSize: '0.75rem',
-                                        fontWeight: 500,
-                                        textTransform: 'uppercase',
-                                        color: activity.type === 'milestone' ? 'var(--text-green-600)' : activity.type === 'status' ? 'var(--text-orange-600)' : 'var(--text-blue-600)',
-                                        backgroundColor: activity.type === 'milestone' ? 'var(--bg-green-50)' : activity.type === 'status' ? 'var(--bg-orange-50)' : 'var(--bg-blue-50)'
-                                    }}>
+                                    <div
+                                        className="activity-badge"
+                                        style={{
+                                            color: activity.type === 'milestone' ? 'var(--text-green-600)' : activity.type === 'status' ? 'var(--text-orange-600)' : 'var(--text-blue-600)',
+                                            backgroundColor: activity.type === 'milestone' ? 'var(--bg-green-50)' : activity.type === 'status' ? 'var(--bg-orange-50)' : 'var(--bg-blue-50)'
+                                        }}
+                                    >
                                         {activity.type}
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <div style={{ textAlign: 'center', color: 'var(--slate-400)', padding: '1rem' }}>
+                            <div className="text-center text-slate-400 p-4">
                                 No recent activity
                             </div>
                         )}

@@ -183,6 +183,110 @@ const LandingPage = () => {
                 </div>
             </section>
 
+            {/* Pricing Section */}
+            <section id="pricing" className="py-24 relative">
+                <div className="max-w-7xl mx-auto px-6">
+                    <motion.div
+                        className="text-center mb-16"
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        variants={fadeInUp}
+                    >
+                        <h2 className="text-3xl md:text-5xl font-bold mb-6 text-slate-800">Simple, Transparent Pricing</h2>
+                        <p className="text-xl text-slate-600 max-w-2xl mx-auto">Start for free, scale as you grow. No hidden fees.</p>
+                    </motion.div>
+
+                    <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                        {/* Starter Plan */}
+                        <motion.div
+                            className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl transition-all relative overflow-hidden"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.1 }}
+                        >
+                            <div className="mb-6">
+                                <h3 className="text-xl font-bold text-slate-800">Starter</h3>
+                                <div className="text-4xl font-bold mt-4 mb-2">$0</div>
+                                <p className="text-slate-500">For early-stage founders</p>
+                            </div>
+                            <ul className="space-y-4 mb-8">
+                                <li className="flex items-center gap-3 text-slate-600"><CheckCircle size={18} className="text-blue-500" /> 1 User</li>
+                                <li className="flex items-center gap-3 text-slate-600"><CheckCircle size={18} className="text-blue-500" /> Basic Validation Tools</li>
+                                <li className="flex items-center gap-3 text-slate-600"><CheckCircle size={18} className="text-blue-500" /> 3 Active Projects</li>
+                                <li className="flex items-center gap-3 text-slate-600"><CheckCircle size={18} className="text-blue-500" /> Community Support</li>
+                            </ul>
+                            <motion.button
+                                className="w-full py-3 px-6 rounded-xl border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition-colors"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                Get Started
+                            </motion.button>
+                        </motion.div>
+
+                        {/* Pro Plan */}
+                        <motion.div
+                            className="bg-slate-900 text-white p-8 rounded-2xl border border-slate-800 shadow-2xl relative overflow-hidden transform md:-translate-y-4"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <div className="absolute top-0 right-0 bg-gradient-to-l from-blue-500 to-purple-500 text-xs font-bold px-3 py-1 rounded-bl-lg">POPULAR</div>
+                            <div className="mb-6">
+                                <h3 className="text-xl font-bold">Pro</h3>
+                                <div className="text-4xl font-bold mt-4 mb-2">$29<span className="text-lg text-slate-400 font-normal">/mo</span></div>
+                                <p className="text-slate-400">For growing startups</p>
+                            </div>
+                            <ul className="space-y-4 mb-8">
+                                <li className="flex items-center gap-3 text-slate-300"><CheckCircle size={18} className="text-blue-400" /> Up to 5 Users</li>
+                                <li className="flex items-center gap-3 text-slate-300"><CheckCircle size={18} className="text-blue-400" /> Advanced Financial Modeling</li>
+                                <li className="flex items-center gap-3 text-slate-300"><CheckCircle size={18} className="text-blue-400" /> Unlimited Projects</li>
+                                <li className="flex items-center gap-3 text-slate-300"><CheckCircle size={18} className="text-blue-400" /> Priority Support</li>
+                                <li className="flex items-center gap-3 text-slate-300"><CheckCircle size={18} className="text-blue-400" /> AI Insights</li>
+                            </ul>
+                            <motion.button
+                                className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold hover:shadow-lg transition-all"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                Start Free Trial
+                            </motion.button>
+                        </motion.div>
+
+                        {/* Enterprise Plan */}
+                        <motion.div
+                            className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl transition-all relative overflow-hidden"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.3 }}
+                        >
+                            <div className="mb-6">
+                                <h3 className="text-xl font-bold text-slate-800">Enterprise</h3>
+                                <div className="text-4xl font-bold mt-4 mb-2">Custom</div>
+                                <p className="text-slate-500">For scaling teams</p>
+                            </div>
+                            <ul className="space-y-4 mb-8">
+                                <li className="flex items-center gap-3 text-slate-600"><CheckCircle size={18} className="text-blue-500" /> Unlimited Users</li>
+                                <li className="flex items-center gap-3 text-slate-600"><CheckCircle size={18} className="text-blue-500" /> Custom Integrations</li>
+                                <li className="flex items-center gap-3 text-slate-600"><CheckCircle size={18} className="text-blue-500" /> Dedicated Account Manager</li>
+                                <li className="flex items-center gap-3 text-slate-600"><CheckCircle size={18} className="text-blue-500" /> 24/7 Phone Support</li>
+                            </ul>
+                            <motion.button
+                                className="w-full py-3 px-6 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition-colors"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                Contact Sales
+                            </motion.button>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
             {/* CTA Section */}
             <section className="cta-section">
                 <motion.div
