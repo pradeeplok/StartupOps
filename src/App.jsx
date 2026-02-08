@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
+import Onboarding from './pages/Onboarding';
 
 import { initialTasks, columns as initialColumns, users } from './data/mockData';
 
@@ -244,6 +245,16 @@ function App() {
         <Route path="/validate/:id" element={<PublicValidation />} />
         <Route path="/roadmap/public/:id" element={<PublicRoadmap />} />
         <Route path="/report/investor" element={<InvestorReport />} />
+
+        {/* Onboarding Route */}
+        <Route
+          path="/onboarding"
+          element={
+            <ProtectedRoute>
+              <Onboarding />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Protected Routes */}
         <Route path="/dashboard" element={

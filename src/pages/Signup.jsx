@@ -85,7 +85,7 @@ const Signup = () => {
             await createUserProfile(user, formData.company, formData.name);
 
             // Navigate to dashboard
-            navigate('/dashboard');
+            navigate('/onboarding');
         } catch (error) {
             console.error('Signup error:', error);
             let errorMessage = 'Failed to create account';
@@ -121,7 +121,7 @@ const Signup = () => {
             await createUserProfile(user, 'My Startup', user.displayName);
 
             // Navigate to dashboard
-            navigate('/dashboard');
+            navigate('/onboarding');
         } catch (error) {
             console.error('Google signup error:', error);
             let errorMessage = 'Failed to sign up with Google';
