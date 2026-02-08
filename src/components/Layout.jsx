@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Map, BarChart3, Users, Settings, LogOut, Presentation, DollarSign, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, Map, BarChart3, Users, Settings, LogOut, Presentation, DollarSign, Sun, Moon, TrendingUp, ListTodo } from 'lucide-react';
 
 import { UserContext } from '../App';
 
@@ -8,12 +8,12 @@ const Layout = () => {
     const { userRole, toggleRole, theme, toggleTheme, logout } = React.useContext(UserContext);
 
     const allNavItems = [
-        { label: 'Command Center', path: '/', icon: LayoutDashboard },
-        { label: 'Execution Roadmap', path: '/roadmap', icon: Map },
-        { label: 'Recommendation Engine', path: '/recommendation', icon: BarChart3 },
-        { label: 'Finance & Runway', path: '/finance', icon: DollarSign, roles: ['founder'] },
-        { label: 'Team & Roles', path: '/team', icon: Users },
-        { label: 'Pitch Generator', path: '/pitch', icon: Presentation, roles: ['founder'] },
+        { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+        { label: 'Validation', path: '/dashboard/recommendation', icon: TrendingUp },
+        { label: 'Roadmap', path: '/dashboard/roadmap', icon: ListTodo },
+        { label: 'Finance', path: '/dashboard/finance', icon: DollarSign },
+        { label: 'Team & Roles', path: '/dashboard/team', icon: Users },
+        { label: 'Pitch Generator', path: '/dashboard/pitch', icon: Presentation, roles: ['founder'] },
     ];
 
     const navItems = allNavItems.filter(item => !item.roles || item.roles.includes(userRole));
